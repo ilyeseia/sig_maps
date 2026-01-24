@@ -1,0 +1,5 @@
+ALTER TABLE sig.resource
+DROP COLUMN resource_values;
+
+ALTER TABLE sig.resource_value
+ADD parent_id uuid;

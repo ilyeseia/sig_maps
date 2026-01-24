@@ -1,0 +1,111 @@
+[
+    {
+        "label": "Module Layer",
+        "name": "ROLE_SIG_LAYER",
+        "permissions": {
+            "Creer un layer": "ROLE_SIG_LAYER_CREATE",
+            "Mettre a jour un layer": "ROLE_SIG_LAYER_UPDATE",
+            "Afficher un layer": "ROLE_SIG_LAYER_READ",
+            "Supprimer un layer": "ROLE_SIG_LAYER_DELETE"
+        }
+    },
+    {
+        "label": "Module Champ",
+        "name": "ROLE_SIG_FIELD",
+        "permissions": {
+            "Creer un Champ": "ROLE_SIG_FIELD_CREATE",
+            "Mettre a jour un Champ": "ROLE_SIG_FIELD_UPDATE",
+            "Afficher un Champ": "ROLE_SIG_FIELD_READ",
+            "Supprimer un Champ": "ROLE_SIG_FIELD_DELETE"
+        }
+    },
+    {
+        "label": "Module Resource",
+        "name": "ROLE_SIG_RESOURCE",
+        "permissions": {
+            "Creer une resource": "ROLE_SIG_RESOURCE_CREATE",
+            "Mettre a jour une resource": "ROLE_SIG_RESOURCE_UPDATE",
+            "Afficher une resource": "ROLE_SIG_RESOURCE_READ",
+            "Supprimer une resource": "ROLE_SIG_RESOURCE_DELETE",
+            "Importer une resource" : "ROLE_SIG_RESOURCE_IMPORT"
+        }
+    },
+    {
+        "label": "Module Parametre",
+        "name": "ROLE_SIG_SETTINGS",
+        "permissions": {
+            "Creer un parametre": "ROLE_SIG_SETTINGS_CREATE",
+            "Mettre a jour un parametre": "ROLE_SIG_SETTINGS_UPDATE",
+            "Afficher un parametre": "ROLE_SIG_SETTINGS_READ",
+            "Supprimer un parametre": "ROLE_SIG_SETTINGS_DELETE"
+        }
+    },
+    {
+        "label": "Module Tag",
+        "name": "ROLE_SIG_TAG",
+        "permissions": {
+            "Creer une tag": "ROLE_SIG_TAG_CREATE",
+            "Mettre a jour une tag": "ROLE_SIG_TAG_UPDATE",
+            "Afficher une tag": "ROLE_SIG_TAG_READ",
+            "Supprimer une tag": "ROLE_SIG_TAG_DELETE"
+        }
+    },
+    {
+        "label": "Module User",
+        "name": "ROLE_SIG_USER",
+        "permissions": {
+            "Creer un utilisateur": "ROLE_SIG_USER_CREATE",
+            "Mettre a jour un utilisateur": "ROLE_SIG_USER_UPDATE",
+            "Afficher un utilisateur": "ROLE_SIG_USER_READ",
+            "Supprimer un utilisateur": "ROLE_SIG_USER_DELETE"
+        }
+    },
+    {
+        "label": "Module Group",
+        "name": "ROLE_SIG_GROUP",
+        "permissions": {
+            "Creer un groupe": "ROLE_SIG_GROUP_CREATE",
+            "Mettre a jour un groupe": "ROLE_SIG_GROUP_UPDATE",
+            "Creer un group": "ROLE_SIG_GROUP_READ",
+            "Supprimer un group": "ROLE_SIG_GROUP_DELETE"
+        }
+    },
+    {
+        "label": "Module Point d'interet",
+        "name": "ROLE_SIG_ENTITY_ELEMENT",
+        "permissions": {
+            "Creer un point d'interet": "ROLE_SIG_ENTITY_ELEMENT_CREATE",
+            "Mettre a jour un point d'interet": "ROLE_SIG_ENTITY_ELEMENT_UPDATE",
+            "Afficher un point d'interet": "ROLE_SIG_ENTITY_ELEMENT_READ",
+            "Supprimer un point d'interet": "ROLE_SIG_ENTITY_ELEMENT_DELETE",
+            "Exporter un point d'interet": "ROLE_SIG_ENTITY_ELEMENT_EXPORT",
+            "Importer un point d'interet": "ROLE_SIG_ENTITY_ELEMENT_IMPORT"
+        }
+    },
+    {
+        "label": "Module File",
+        "name": "ROLE_SIG_FILE",
+        "permissions": {
+            "Mettre un fichier sur le serveur": "ROLE_SIG_FILE_UPLOAD",
+            "Telecharge un fichier depuis le serveur": "ROLE_SIG_FILE_LOAD"
+        }
+    },
+    {
+        "label": "Module Session",
+        "name": "ROLE_SIG_SESSION",
+        "permissions": {
+            "Afficher les sessions ouverts": "ROLE_SIG_SESSION_READ",
+            "supprimer une session ouvert": "ROLE_SIG_SESSION_DELETE"
+        }
+    },
+    {
+        "label": "Module Map",
+        "name": "ROLE_SIG_MAP",
+        "permissions": {
+            "Creer une map": "ROLE_SIG_MAP_CREATE",
+            "Mettre a jour une map": "ROLE_SIG_MAP_UPDATE",
+            "Afficher une map": "ROLE_SIG_MAP_READ",
+            "Supprimer une map": "ROLE_SIG_MAP_DELETE"
+        }
+    }
+]

@@ -1,0 +1,33 @@
+<!DOCTYPE html encode="utf-8"">
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title th:remove="all">Création d'un compte</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+</head>
+<body>
+	<div
+		style="padding: 0px; width: 1000px; margin: auto; background: #ffffff repeat; top:100%; color: #666666">
+		<p>
+			Cher <span th:text="${firstName}"></span> <span th:text="${lastName}"></span>
+		</p>
+		<p style="margin-top: 27px">
+			Votre compte a &egrave;t&egrave; cr&egrave;&egrave; avec le nom
+			d'utilisateur <span style="font-weight: bold;"><span
+				th:text="${username}"></span></span> et le mot de passe <span
+				style="font-weight: bold;"><span th:text="${password}"></span>
+			</span> pour pouvoir acc&egrave;der &agrave; vos privil&eacute;ges.
+		</p>
+		<p>Pour acc&egrave;der &#224; votre compte veuillez vous clicker
+			sur le button ci-dessus.</p>
+		<div style="margin: 16px 0px 16px 0px">
+			<a th:href="${server_address}"
+				style="background-color: #009e99; padding: 7px 19px 8px 19px; text-decoration: none; color: #fff; border-radius: 4px">Acc&egrave;s
+				au compte</a>
+		</div>
+		<p style="font-size: 17px; margin-top: 39px; font-weight: 400">Meilleures
+			salutations,</p>
+	</div>
+</body>
+</html>

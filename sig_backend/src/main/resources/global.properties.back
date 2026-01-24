@@ -1,0 +1,44 @@
+########################################################
+
+spring.velocity.resourceLoaderPath=classpath:/templates/
+spring.velocity.prefix=
+spring.velocity.suffix=.vm
+spring.velocity.cache=false
+spring.velocity.check-template-location=true
+spring.velocity.content-type=text/html
+spring.velocity.charset=UTF-8
+spring.velocity.properties.input.encoding=UTF-8
+spring.velocity.properties.output.encoding=UTF-8
+
+#########################################################
+
+default.date.format = yyyy-MM-dd HH:mm:ss
+default.path.folder.temp = /sigeadn/temp/
+default.path.folder.image = /sigeadn/images/
+default.language = fr
+
+eadn.sig.jwtSecret=ENC(WF4RyHiJ4lb/lAzAUQEK2g==)
+eadn.sig.jwtRefreshExpirationMs=36000000
+eadn.sig.jwtExpirationMs=18000000
+eadn.sig.server= https://sig.mjs.gov.dz/api/v1.0
+eadn.sig.front.server = https://sig.mjs.gov.dz
+
+redis.host= 192.168.3.154
+redis.port= 6379
+redis.password= Solution.2021!
+redis.timeout= 60
+
+geoserver.wms.url = https://sig.mjs.gov.dz/geoserver/limite_admin/wms
+geoserver.wfs.url = https://sig.mjs.gov.dz/geoserver/limite_admin/wfs
+geoserver.rest.url = https://sig.mjs.gov.dz/geoserver/rest
+geoserver.rest.user = geo_admin
+geoserver.rest.userGuest = guest
+jasypt.encryptor.algorithm=PBEWithMD5AndDES
+jasypt.encryptor.password=secret-@-sercret
+geoserver.rest.password = ENC(QVA7P2ui7Z1KgV8aUxpow+y/1VooU6gU)
+geoserver.rest.guestRole = GUEST
+geoserver.rest.password = Solution.2021!
+geoserver.workspace = limite_admin
+geoserver.datastore = database
+
+eadn.sig.domaines_autorises=https://sig.mjs.gov.dz

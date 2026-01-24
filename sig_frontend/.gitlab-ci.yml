@@ -1,0 +1,8 @@
+build-images:
+ stage: "build"
+ only: 
+   - master
+ script: 
+   - chmod +x deploy.sh
+   - client=frontendalpha ./deploy.sh
+   

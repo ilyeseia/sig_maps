@@ -1,0 +1,27 @@
+.modal-card {
+    min-width: fit-content !important;
+    max-width: 50vw;
+    min-height: fit-content !important;
+    max-height: 95vh;
+    &-body{
+      overflow-y: auto;
+      scroll-behavior: smooth;
+    }
+    @include respond('tab-port'){
+      margin: 0 auto !important;
+      min-width: 0 !important;
+      max-width: 95vw !important;
+      .modal-card-head, .modal-card-foot {
+        padding: 1.5rem 2rem;
+      }
+      .modal-card-body{
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+    }
+    @include respond('phone'){
+      .modal-card-head, .modal-card-foot {
+        padding: 1rem 1rem;
+      }
+    }
+}

@@ -1,0 +1,10 @@
+package dz.eadn.sig.model;
+
+public enum CLASSIFICATIONMODE {
+    EQUAL_COUNT,
+    EQUAL_INTERVAL,
+    LOGARITHMIC_SCALE,
+    NATURAL_BREAKS,
+    PRETTY_BREAKS,
+    STANDARD_DEVIATION
+}

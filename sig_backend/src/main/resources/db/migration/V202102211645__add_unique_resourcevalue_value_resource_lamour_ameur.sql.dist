@@ -1,0 +1,21 @@
+
+--------
+ -------- Author:  Ameur LAMOUR
+-------- Created: 21 FEVRIER. 2021 a 16:45
+--------
+--------scripts ::  add unique constraint to resource value table
+--------
+--
+
+--
+
+ALTER TABLE ONLY sig.resource_value DROP CONSTRAINT IF EXISTS uk_rv_value_resource;
+ALTER TABLE ONLY sig.resource_value ADD CONSTRAINT uk_rv_value_resource UNIQUE (value, resource_id);
+
+
+
+
+--
+-- PostgreSQL database dump complete
+--
+

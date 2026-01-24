@@ -1,0 +1,48 @@
+ pipeline{
+        agent{
+            label 'sig-node'
+        }
+        options { buildDiscarder(logRotator(numToKeepStr: '30',artifactDaysToKeepStr: '30', artifactNumToKeepStr: '30', daysToKeepStr: '10')) }
+        environment {
+            FRONTEND_IMAGE_TAG = "sig/frontend:build-${env.BUILD_ID}"
+        }
+        stages{
+            stage ("build SIG Backend") {
+                steps {
+                    build job: "../backend/${env.BRANCH_NAME}", propagate: true, wait: true
+                }
+            }
+            stage("Copy Custom Files"){
+                steps{
+                    echo "======== copy templates ... ========"
+                    sh "cp /home/tmps/frontend/constants.js ${WORKSPACE}/ "
+                    sh "cp /home/tmps/frontend/Dockerfile ${WORKSPACE}/"
+                }
+            }
+            stage('Sonarqube Code analysis'){
+                steps{
+                     withSonarQubeEnv('sonarqube-server') {
+                        sh '/home/centos/sonar-scanner-4.4.0.2170-linux/bin/sonar-scanner -Dsonar.projectKey=sig-front -Dsonar.projectName=sig-front'
+                    }
+               }
+            }
+            stage("Build and Launch Frontend"){
+                steps{
+                    echo "========executing Build Frontend Image========"
+                    sh "docker build -t ${FRONTEND_IMAGE_TAG} ."
+                    sh "docker stop frontsig && docker rm frontsig || true"
+                    sh "docker  run   --name frontsig -p 80:80 -d ${FRONTEND_IMAGE_TAG}"
+                }
+                
+            }
+        }
+        post{
+            success{
+                sh "docker image rm sig/frontend:build-${currentBuild.previousBuild.getNumber()} || true"
+            }
+            failure{
+                mail to: 'hamza.achi@eadn.dz,halim.amrani@eadn.dz,abdenour.achrouf@eadn.dz,ameur.lamour@eadn.dz', subject: "PIPELINE FAILURE ${currentBuild.fullDisplayName}", body: "Boom, build failed :( ${env.BUILD_URL}"
+                slackSend(color: 'danger', channel: 'git_sig_events', message: "Build failed :( . JOB: ${env.JOB_NAME} URL: ${env.BUILD_URL}")
+            }
+        }
+    }

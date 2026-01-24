@@ -1,0 +1,22 @@
+# Ignorer les fichiers et répertoires inutiles
+.git
+.gitignore
+*.md
+README*
+.gradle
+build
+target
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
+.idea
+.vscode
+*.iml
+*.iws
+*.ipr
+.settings
+.project
+.classpath
+bin
+out

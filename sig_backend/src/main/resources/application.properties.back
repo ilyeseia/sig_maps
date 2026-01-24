@@ -1,0 +1,56 @@
+## Spring DATASOURCE (DataSourceAutoConfiguration & DataSourceProperties)
+spring.datasource.url=jdbc:postgresql://172.16.0.17:6543/sig_db
+spring.datasource.username=sig_user
+spring.datasource.password=Solution.2021!
+
+# The SQL dialect makes Hibernate generate better SQL for the chosen database
+spring.jpa.properties.hibernate.dialect = org.hibernate.spatial.dialect.postgis.PostgisDialect
+
+# Hibernate ddl auto (create, create-drop, validate, update)
+spring.jpa.hibernate.ddl-auto =validate
+spring.jpa.show-sql=true
+
+## MULTIPART (MultipartProperties)
+# Enable multipart uploads
+spring.servlet.multipart.enabled=true
+# Threshold after which files are written to disk.
+spring.servlet.multipart.file-size-threshold=2KB
+# Max file size.
+spring.servlet.multipart.max-file-size=200MB
+# Max Request Size
+spring.servlet.multipart.max-request-size=215MB
+spring.main.allow-circular-references=true
+
+#server.tomcat.accesslog.enabled=true
+
+#server.tomcat.accesslog.suffix=.log
+#server.tomcat.accesslog.prefix=access_log
+#server.tomcat.accesslog.file-date-format=.yyyy-MM-dd
+
+#server.tomcat.basedir=tomcat
+#server.tomcat.accesslog.directory=logs
+#server.tomcat.accesslog.pattern=common
+
+#logging.level.org.apache.tomcat=DEBUG
+#logging.level.org.apache.catalina=DEBUG
+
+#logging.file.name=/logs/prodsig.log
+
+###################################################################
+
+spring.mail.host=mail.mjs.gov.dz
+spring.mail.port=465
+spring.mail.username=no-reply@mjs.gov.dz
+spring.mail.password=wGq4hZ9L9N
+spring.jpa.properties.hibernate.ejb.interceptor=dz.eadn.sig.util.LoggingInterceptor
+
+# Other properties
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.connectiontimeout=5000
+spring.mail.properties.mail.smtp.timeout=5000
+spring.mail.properties.mail.smtp.writetimeout=5000
+
+# TLS , port 587
+spring.mail.properties.mail.smtp.ssl.enable=true
+
+

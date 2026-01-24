@@ -1,0 +1,119 @@
+plugins {
+    id 'org.springframework.boot' version '2.7.18'
+    id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+    id 'java'
+    id "org.sonarqube" version "2.7"
+}
+group = 'dz.eadn'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+apply plugin: "war"
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+repositories {
+    maven { url "https://repo.osgeo.org/repository/release/" }
+    jcenter()
+    google()
+}
+
+ext {
+    set('springCloudVersion', "2021.0.9")
+    set('geotoolsVersion', "27.4")
+}
+
+dependencies {
+
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-data-rest'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation 'org.springframework.boot:spring-boot-starter-batch'
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation group: 'org.modelmapper', name: 'modelmapper', version: '2.3.8'
+   
+    
+    
+	runtimeOnly 'org.hsqldb:hsqldb'
+
+    implementation group: 'org.locationtech.jts', name: 'jts-core', version: '1.16.1'
+    implementation group: 'com.github.ulisesbocchio', name: 'jasypt-spring-boot-starter', version: '2.1.1'
+
+    
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.session:spring-session-core'
+    // GeoTools 27.4 (Consolidated)
+    implementation group: 'org.geotools.xsd', name: 'gt-xsd-sld', version: "${geotoolsVersion}"
+    implementation group: 'org.geotools', name: 'gt-swing', version: "${geotoolsVersion}"
+    implementation group: 'org.geotools', name: 'gt-shapefile', version: "${geotoolsVersion}"
+    implementation group: 'org.geotools', name: 'gt-process', version: "${geotoolsVersion}"
+    implementation group: 'org.geotools', name: 'gt-process-feature', version: "${geotoolsVersion}"
+    implementation group: 'org.geotools', name: 'gt-process-raster', version: "${geotoolsVersion}"
+    implementation group: 'org.geotools', name: 'gt-process-geometry', version: "${geotoolsVersion}"
+    implementation group: 'com.mapbox.mapboxsdk', name: 'mapbox-java-geojson', version: '2.2.10'
+
+
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    runtimeOnly 'org.postgresql:postgresql'
+    implementation group: 'org.hibernate', name: 'hibernate-gradle-plugin', version: '5.4.8.Final'
+    implementation group: 'org.hibernate', name: 'hibernate-spatial', version: '5.6.15.Final'
+    implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
+    implementation group: 'redis.clients', name: 'jedis', version: '4.3.0-m1'
+    compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.24'
+    implementation group: 'com.vladmihalcea', name: 'hibernate-types-52', version: '2.18.0'
+    implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.2.2'
+    implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.6.11'
+    implementation group: 'org.apache.commons', name: 'commons-io', version: '2.11.0'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: '2.7.3'
+    implementation group: 'org.thymeleaf', name: 'thymeleaf-spring5', version: '3.1.0.M2'
+    implementation group: 'org.thymeleaf', name: 'thymeleaf', version: '3.1.0.M2'
+
+    implementation group: 'org.geotools', name: 'gt-geojson', version: "${geotoolsVersion}"
+    implementation group: 'org.geotools', name: 'gt-shapefile', version: "${geotoolsVersion}"
+    implementation group: 'org.geotools', name: 'gt-xml', version: "${geotoolsVersion}"
+    implementation group: 'org.geotools.xsd', name: 'gt-xsd-kml', version: "${geotoolsVersion}"
+    implementation group: 'org.geotools.xsd', name: 'gt-xsd-wfs', version: "${geotoolsVersion}"
+    implementation group: 'it.geosolutions.imageio-ext' ,name : 'imageio-ext-png' ,version : '1.3.4'
+
+
+    implementation group: 'org.apache.velocity', name: 'velocity', version: '1.7'
+    implementation group: 'com.opencsv', name: 'opencsv', version: '5.6'
+    implementation group: 'eu.bitwalker', name: 'UserAgentUtils', version: '1.21'
+    implementation group: 'com.google.http-client', name: 'google-http-client', version: '1.42.2'
+
+
+
+
+
+    // compile group: 'org.postgis', name: 'postgis-jdbc', version: '1.1.3'
+
+    implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-csv', version: '2.13.3'
+    implementation group: 'com.itextpdf', name: 'itextpdf', version: '5.5.13.3'
+    implementation group: 'org.apache.poi', name: 'poi', version: '5.2.2'
+    implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '5.2.2'
+
+    implementation group: 'org.dom4j', name: 'dom4j', version: '2.1.3'
+
+
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+    //testImplementation 'org.springframework.security:spring-security-test'
+    //Other Dependencies >>
+    //LOMBOK Dependencies
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+}
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
+test {
+    useJUnitPlatform()
+}
