@@ -23,7 +23,7 @@ module.exports = {
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/kharitadz-logo-offecial.ico' },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css?family=Righteous" }
+      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&family=Righteous&display=swap" }
     ],
     script: [
     ]

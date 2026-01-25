@@ -1,37 +1,167 @@
-// Add items here that don't render CSS
+// =============================================
+// DESIGN SYSTEM - SIG GEOPORTAIL
+// Modern Corporate Tech Aesthetic
+// =============================================
 
-// Colors Used
-$color-primary:#009e99;  // #009e99
-$color-primary-light:#00d1b2; //#00d1b2;
-$color-primary-dark: #28b485;
-$color-grey-dark: #777;
-$color-grey-dark-2: #5c5c6f; 
-$color-grey-dark-3: #1e1e28; 
+// ============ COLOR PALETTE ============
+// Primary - Deep Navy/Slate
+$color-primary: #0f172a;
+$color-primary-light: #1e293b;
+$color-primary-dark: #020617;
 
+// Accents - Vibrant & Dynamic
+$color-accent: #f97316;           // Vibrant orange
+$color-accent-hover: #fb923c;
+$color-accent-secondary: #06b6d4; // Cyan
+$color-accent-secondary-hover: #22d3ee;
 
+// Semantic Colors
+$color-success: #10b981;
+$color-warning: #f59e0b;
+$color-error: #ef4444;
+$color-info: #3b82f6;
 
-$color-grey-light: #e0e0e6;
+// Neutrals
+$color-white: #ffffff;
+$color-black: #000000;
+$color-grey-50: #f8fafc;
+$color-grey-100: #f1f5f9;
+$color-grey-200: #e2e8f0;
+$color-grey-300: #cbd5e1;
+$color-grey-400: #94a3b8;
+$color-grey-500: #64748b;
+$color-grey-600: #475569;
+$color-grey-700: #334155;
+$color-grey-800: #1e293b;
+$color-grey-900: #0f172a;
 
+// Legacy compatibility (for existing components)
+$color-grey-dark: $color-grey-600;
+$color-grey-dark-2: $color-grey-700;
+$color-grey-dark-3: $color-grey-900;
+$color-grey-light: $color-grey-200;
+$color-grey-light-1: $color-grey-100;
+$color-grey-light-2: $color-grey-50;
+$color-secondary: $color-accent;
+$color-secondary-dark: $color-accent-hover;
+$color-tertiary-light: $color-accent-secondary;
+$color-tertiary-dark: $color-info;
 
-$color-grey-light-1: #f4f4f6;
-$color-grey-light-2: #eee;
-$color-white: #fff;
-$color-black: #000;
+// ============ GRADIENTS ============
+$gradient-hero: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%);
+$gradient-accent: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
+$gradient-accent-hover: linear-gradient(135deg, #fb923c 0%, #fdba74 100%);
+$gradient-dark: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+$gradient-glass: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+$gradient-shimmer: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%);
 
-$color-secondary: #D80D82;
-$color-secondary-dark: #ff7730;
+// ============ GLASSMORPHISM ============
+$glass-bg: rgba(255, 255, 255, 0.08);
+$glass-bg-light: rgba(255, 255, 255, 0.15);
+$glass-border: rgba(255, 255, 255, 0.12);
+$glass-border-light: rgba(255, 255, 255, 0.2);
+$glass-blur: 16px;
+$glass-blur-heavy: 24px;
 
-$color-tertiary-light: #2998ff;
-$color-tertiary-dark: #5643fa;
+// ============ SHADOWS ============
+$shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+$shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+$shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+$shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+$shadow-glow-accent: 0 0 40px rgba(249, 115, 22, 0.4);
+$shadow-glow-cyan: 0 0 40px rgba(6, 182, 212, 0.3);
 
-//GRID Widths and Lengths
+// ============ TYPOGRAPHY ============
+$font-display: 'Outfit', 'Righteous', sans-serif;  // For headlines
+$font-body: 'DM Sans', 'Poppins', sans-serif;      // For body text
+$font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+$font-size-xs: 0.75rem;    // 12px
+$font-size-sm: 0.875rem;   // 14px
+$font-size-base: 1rem;     // 16px
+$font-size-lg: 1.125rem;   // 18px
+$font-size-xl: 1.25rem;    // 20px
+$font-size-2xl: 1.5rem;    // 24px
+$font-size-3xl: 1.875rem;  // 30px
+$font-size-4xl: 2.25rem;   // 36px
+$font-size-5xl: 3rem;      // 48px
+$font-size-6xl: 3.75rem;   // 60px
+$font-size-7xl: 4.5rem;    // 72px
+
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+$font-weight-extrabold: 800;
+
+$line-height-tight: 1.1;
+$line-height-snug: 1.25;
+$line-height-normal: 1.5;
+$line-height-relaxed: 1.625;
+
+$letter-spacing-tight: -0.02em;
+$letter-spacing-normal: 0;
+$letter-spacing-wide: 0.05em;
+$letter-spacing-wider: 0.1em;
+
+// Legacy compatibility
+$default-font-size: 1rem;
+
+// ============ SPACING ============
+$spacing-1: 0.25rem;   // 4px
+$spacing-2: 0.5rem;    // 8px
+$spacing-3: 0.75rem;   // 12px
+$spacing-4: 1rem;      // 16px
+$spacing-5: 1.25rem;   // 20px
+$spacing-6: 1.5rem;    // 24px
+$spacing-8: 2rem;      // 32px
+$spacing-10: 2.5rem;   // 40px
+$spacing-12: 3rem;     // 48px
+$spacing-16: 4rem;     // 64px
+$spacing-20: 5rem;     // 80px
+$spacing-24: 6rem;     // 96px
+
+// Legacy compatibility
 $grid-width: 114rem;
 $gutter-vertical: 8rem;
 $gutter-vertical-small: 6rem;
 $gutter-horizontal: 6rem;
-$default-border-radius: 3px;
 
+// ============ BORDER RADIUS ============
+$radius-sm: 4px;
+$radius-md: 8px;
+$radius-lg: 12px;
+$radius-xl: 16px;
+$radius-2xl: 24px;
+$radius-full: 9999px;
 
-// FONT SIZES
+// Legacy compatibility
+$default-border-radius: $radius-sm;
 
-$default-font-size: 1.6rem;
+// ============ ANIMATION TIMING ============
+$ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+$ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+$ease-in-out-smooth: cubic-bezier(0.45, 0, 0.55, 1);
+$ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+$duration-fast: 150ms;
+$duration-normal: 300ms;
+$duration-slow: 500ms;
+$duration-slower: 800ms;
+
+// ============ Z-INDEX SCALE ============
+$z-dropdown: 100;
+$z-sticky: 200;
+$z-fixed: 300;
+$z-modal-backdrop: 400;
+$z-modal: 500;
+$z-popover: 600;
+$z-tooltip: 700;
+
+// ============ BREAKPOINTS ============
+$breakpoint-sm: 640px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 1024px;
+$breakpoint-xl: 1280px;
+$breakpoint-2xl: 1536px;

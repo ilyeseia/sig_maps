@@ -1,17 +1,30 @@
 <template>
-  <header class="landing-header">
+  <header class="landing-header" :class="{ 'header-scrolled': isScrolled }">
     <div class="container-fluid">
       <div class="header-content">
         <!-- Logo Section -->
         <div class="logo-section">
           <a href="https://www.mjs.gov.dz/index.php/fr" target="_blank" class="logo-link">
-            <img src="~assets/logo_mjs_n.png" alt="logo" height="80" />
-            <span class="brand-text">GÉOPORTAIL MJS</span>
+            <div class="logo-wrapper">
+              <img src="~assets/logo_mjs_n.png" alt="logo" height="70" />
+            </div>
+            <div class="brand-wrapper">
+              <span class="brand-text">GÉOPORTAIL</span>
+              <span class="brand-sub">Ministère Jeunesse & Sports</span>
+            </div>
           </a>
         </div>
 
         <!-- Actions Section -->
         <div class="actions-section">
+          <nav class="nav-links" v-if="!isMobile">
+            <a href="#maps-section" class="nav-link">Cartes</a>
+            <a href="#about" class="nav-link">À Propos</a>
+            <a href="#contact" class="nav-link">Contact</a>
+          </nav>
+          
+          <div class="divider" v-if="!isMobile"></div>
+          
           <div class="main-actions">
             <button 
               v-if="!profile.authenticated" 
@@ -19,49 +32,53 @@
               class="btn-glass" 
               @click="$router.push('/auth')"
             >
-              <i class="fas fa-sign-in-alt mr-2"></i> Connexion
+              <i class="fas fa-sign-in-alt"></i>
+              <span>Connexion</span>
             </button>
             <button 
               v-else 
               type="button" 
-              class="btn-glass" 
+              class="btn-glass btn-dashboard" 
               @click="$router.push('/dashboard')"
             >
-              <i class="fas fa-user-cog mr-2"></i> Dashboard
+              <i class="fas fa-th-large"></i>
+              <span>Dashboard</span>
             </button>
           </div>
           
-          <div class="divider"></div>
-          
           <div class="share-action">
-            <button class="btn-icon" @click="toggleSocial">
-              <i class="fas fa-share-alt fa-lg"></i>
+            <button class="btn-icon" @click="toggleSocial" aria-label="Partager">
+              <i class="fas fa-share-alt"></i>
             </button>
           </div>
         </div>
       </div>
 
-      <!-- Social Media Dropdown (Glassmorphism) -->
-      <transition name="fade">
-        <div v-show="showSocial" class="social-dropdown glass-panel">
+      <!-- Social Media Dropdown -->
+      <transition name="dropdown">
+        <div v-show="showSocial" class="social-dropdown">
           <div class="social-item twitter">
             <a href="https://twitter.com/intent/tweet?url=https://sig.mjs.gov.dz/" target="_blank">
-              <i class="fab fa-twitter"></i> Partager sur Twitter
+              <i class="fab fa-twitter"></i> 
+              <span>Twitter</span>
             </a>
           </div>
           <div class="social-item facebook">
             <a href="https://www.facebook.com/sharer.php?u=https://sig.mjs.gov.dz/" target="_blank">
-              <i class="fab fa-facebook"></i> Partager sur Facebook
+              <i class="fab fa-facebook"></i> 
+              <span>Facebook</span>
             </a>
           </div>
           <div class="social-item linkedin">
             <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://sig.mjs.gov.dz/" target="_blank">
-              <i class="fab fa-linkedin-in"></i> Partager sur Linkedin
+              <i class="fab fa-linkedin-in"></i> 
+              <span>LinkedIn</span>
             </a>
           </div>
           <div class="social-item email">
             <a href="mailto:contact@mjs.dz">
-              <i class="fas fa-envelope"></i> Envoyer par mail
+              <i class="fas fa-envelope"></i> 
+              <span>Email</span>
             </a>
           </div>
         </div>
@@ -71,44 +88,86 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 
 export default {
   name: 'HeaderSection',
   data() {
     return {
-      showSocial: false
+      showSocial: false,
+      isScrolled: false
     };
   },
   computed: {
-    ...mapState(['profile'])
+    ...mapState(['profile']),
+    ...mapGetters({
+      isMobile: 'app/getIsMobile'
+    })
+  },
+  mounted() {
+    window.addEventListener('scroll', this.handleScroll);
+  },
+  beforeDestroy() {
+    window.removeEventListener('scroll', this.handleScroll);
   },
   methods: {
     toggleSocial() {
       this.showSocial = !this.showSocial;
+    },
+    handleScroll() {
+      this.isScrolled = window.scrollY > 50;
     }
   }
 };
 </script>
 
 <style lang="scss" scoped>
-// Variables would ideally be in a shared file, but defining here for safety
-$primary-color: #131c50;
-$glass-bg: rgba(255, 255, 255, 0.1);
-$glass-border: rgba(255, 255, 255, 0.2);
+// Design system variables
+$primary: #0f172a;
+$primary-light: #1e293b;
+$accent: #f97316;
+$accent-secondary: #06b6d4;
+$glass-bg: rgba(255, 255, 255, 0.08);
+$glass-border: rgba(255, 255, 255, 0.12);
+$ease-premium: cubic-bezier(0.16, 1, 0.3, 1);
 
 .landing-header {
-  background: $primary-color;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
   padding: 1rem 0;
-  position: relative;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  z-index: 100;
+  transition: all 0.4s $ease-premium;
+  background: transparent;
+  
+  &.header-scrolled {
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 0.75rem 0;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+    
+    .logo-wrapper img {
+      height: 55px;
+    }
+    
+    .brand-wrapper {
+      .brand-text {
+        font-size: 1.2rem;
+      }
+      .brand-sub {
+        font-size: 0.65rem;
+      }
+    }
+  }
 }
 
 .header-content {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 0 2rem;
 }
 
 .logo-section {
@@ -116,23 +175,52 @@ $glass-border: rgba(255, 255, 255, 0.2);
     display: flex;
     align-items: center;
     text-decoration: none;
+    gap: 1rem;
     
-    img {
-      margin-right: 15px;
-      transition: transform 0.3s ease;
+    .logo-wrapper {
+      position: relative;
+      
+      img {
+        height: 70px;
+        transition: all 0.3s $ease-premium;
+        filter: drop-shadow(0 2px 8px rgba(0,0,0,0.2));
+      }
     }
     
-    .brand-text {
-      color: white;
-      font-weight: 800;
-      font-size: 1.5rem;
-      font-family: 'Righteous', 'Muli', sans-serif; // Using existing font
-      text-transform: uppercase;
-      letter-spacing: 1px;
+    .brand-wrapper {
+      display: flex;
+      flex-direction: column;
+      
+      .brand-text {
+        color: white;
+        font-weight: 800;
+        font-size: 1.4rem;
+        font-family: 'Outfit', 'Righteous', sans-serif;
+        letter-spacing: 0.05em;
+        transition: all 0.3s ease;
+        background: linear-gradient(135deg, #ffffff 0%, #94a3b8 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      
+      .brand-sub {
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 0.7rem;
+        font-weight: 500;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        transition: all 0.3s ease;
+      }
     }
 
-    &:hover img {
-      transform: scale(1.05);
+    &:hover {
+      .logo-wrapper img {
+        transform: scale(1.05);
+      }
+      .brand-text {
+        background: linear-gradient(135deg, #ffffff 0%, $accent 100%);
+        -webkit-background-clip: text;
+      }
     }
   }
 }
@@ -140,107 +228,194 @@ $glass-border: rgba(255, 255, 255, 0.2);
 .actions-section {
   display: flex;
   align-items: center;
+  gap: 1rem;
 }
 
-// Glassmorphism Button
+.nav-links {
+  display: flex;
+  gap: 0.5rem;
+  
+  .nav-link {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      color: white;
+      background: rgba(255, 255, 255, 0.08);
+    }
+  }
+}
+
 .btn-glass {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   background: $glass-bg;
   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border: 1px solid $glass-border;
   color: white;
-  padding: 0.6rem 1.5rem;
+  padding: 0.7rem 1.3rem;
   border-radius: 50px;
   font-weight: 600;
-  transition: all 0.3s ease;
+  font-size: 0.9rem;
+  transition: all 0.3s $ease-premium;
   cursor: pointer;
-  display: flex;
-  align-items: center;
   outline: none;
 
+  i {
+    font-size: 0.85rem;
+  }
+
   &:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.15);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
   }
 
   &:active {
     transform: translateY(0);
   }
+  
+  &.btn-dashboard {
+    background: linear-gradient(135deg, $accent 0%, darken($accent, 10%) 100%);
+    border-color: transparent;
+    
+    &:hover {
+      box-shadow: 0 8px 25px rgba(249, 115, 22, 0.4);
+    }
+  }
 }
 
 .divider {
   width: 1px;
-  height: 30px;
-  background: rgba(255, 255, 255, 0.3);
-  margin: 0 1.5rem;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.15);
+  margin: 0 0.5rem;
 }
 
 .btn-icon {
   background: transparent;
-  border: none;
-  color: white;
+  border: 1px solid transparent;
+  color: rgba(255, 255, 255, 0.7);
   cursor: pointer;
-  transition: all 0.3s ease;
-  padding: 0.5rem;
+  transition: all 0.3s $ease-premium;
+  padding: 0.6rem;
   border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
 
   &:hover {
     background: rgba(255, 255, 255, 0.1);
+    color: white;
     transform: rotate(15deg);
   }
 }
 
 .social-dropdown {
   position: absolute;
-  top: 100%;
-  right: 20px;
-  margin-top: 10px;
-  background: rgba(19, 28, 80, 0.95);
-  backdrop-filter: blur(16px);
+  top: calc(100% + 10px);
+  right: 2rem;
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 1rem;
-  min-width: 250px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  border-radius: 16px;
+  padding: 0.75rem;
   display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
+  gap: 0.5rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
 }
 
 .social-item {
   a {
     display: flex;
     align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 6px;
     color: white;
     text-decoration: none;
-    font-size: 0.95rem;
-    transition: all 0.2s;
-    padding: 0.5rem;
-    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    min-width: 70px;
 
     i {
-      width: 25px;
-      margin-right: 10px;
-      font-size: 1.1rem;
+      font-size: 1.2rem;
+      transition: transform 0.3s ease;
     }
 
     &:hover {
-      background: rgba(255, 255, 255, 0.1);
-      transform: translateX(5px);
+      background: rgba(255, 255, 255, 0.08);
+      
+      i {
+        transform: scale(1.2);
+      }
     }
   }
 
   &.twitter i { color: #1da1f2; }
   &.facebook i { color: #4267b2; }
   &.linkedin i { color: #0077b5; }
-  &.email i { color: #ffc107; }
+  &.email i { color: $accent; }
 }
 
-.fade-enter-active, .fade-leave-active {
-  transition: opacity 0.3s, transform 0.3s;
+// Dropdown transition
+.dropdown-enter-active {
+  animation: dropIn 0.3s $ease-premium;
 }
-.fade-enter, .fade-leave-to {
-  opacity: 0;
-  transform: translateY(-10px);
+.dropdown-leave-active {
+  animation: dropIn 0.2s reverse ease-in;
+}
+
+@keyframes dropIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+// Mobile responsive
+@media (max-width: 768px) {
+  .header-content {
+    padding: 0 1rem;
+  }
+  
+  .brand-wrapper {
+    display: none !important;
+  }
+  
+  .logo-wrapper img {
+    height: 50px !important;
+  }
+  
+  .btn-glass span {
+    display: none;
+  }
+  
+  .btn-glass {
+    padding: 0.7rem;
+    border-radius: 50%;
+    
+    i {
+      font-size: 1rem;
+      margin: 0;
+    }
+  }
 }
 </style>

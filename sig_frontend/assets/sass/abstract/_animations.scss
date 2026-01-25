@@ -1,0 +1,263 @@
+// =============================================
+// ANIMATIONS & EFFECTS
+// Modern Corporate Tech Aesthetic
+// =============================================
+
+// ============ KEYFRAMES ============
+
+// Float animation for subtle movement
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+// Pulse glow for attention-grabbing elements
+@keyframes pulse-glow {
+
+    0%,
+    100% {
+        box-shadow: 0 0 20px rgba(249, 115, 22, 0.3);
+    }
+
+    50% {
+        box-shadow: 0 0 40px rgba(249, 115, 22, 0.6);
+    }
+}
+
+// Shimmer effect for loading states or highlights
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+// Fade up entrance
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+// Fade in scale
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+// Slide in from left
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-50px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+// Count up number animation helper
+@keyframes countPulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+// Rotate subtle
+@keyframes rotateSlow {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+// Border gradient animation
+@keyframes borderGradient {
+
+    0%,
+    100% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+// ============ MIXINS ============
+
+// Entrance animation with stagger support
+@mixin entrance-animation($delay: 0s, $duration: 0.6s) {
+    animation: fadeUp $duration $ease-out-expo forwards;
+    animation-delay: $delay;
+    opacity: 0;
+}
+
+// Glassmorphism effect
+@mixin glass-effect($blur: $glass-blur, $bg: $glass-bg, $border: $glass-border) {
+    background: $bg;
+    backdrop-filter: blur($blur);
+    -webkit-backdrop-filter: blur($blur);
+    border: 1px solid $border;
+}
+
+// Glass card with hover
+@mixin glass-card($hover: true) {
+    @include glass-effect();
+    border-radius: $radius-lg;
+    transition: all $duration-normal $ease-out-expo;
+
+    @if $hover {
+        &:hover {
+            background: $glass-bg-light;
+            transform: translateY(-4px);
+            box-shadow: $shadow-xl;
+        }
+    }
+}
+
+// Gradient text
+@mixin gradient-text($gradient) {
+    background: $gradient;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+// Button hover lift effect
+@mixin hover-lift($distance: -4px) {
+    transition: all $duration-normal $ease-out-expo;
+
+    &:hover {
+        transform: translateY($distance);
+        box-shadow: $shadow-lg;
+    }
+
+    &:active {
+        transform: translateY(-2px);
+    }
+}
+
+// Shimmer loading effect
+@mixin shimmer-effect() {
+    background: linear-gradient(90deg,
+            transparent 0%,
+            rgba(255, 255, 255, 0.1) 50%,
+            transparent 100%);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+}
+
+// Noise texture overlay
+@mixin noise-texture($opacity: 0.03) {
+    &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        opacity: $opacity;
+        pointer-events: none;
+        z-index: 1;
+    }
+}
+
+// Focus ring for accessibility
+@mixin focus-ring($color: $color-accent) {
+    &:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba($color, 0.4);
+    }
+}
+
+// Responsive font size
+@mixin responsive-text($min-size, $max-size, $min-vw: 320px, $max-vw: 1200px) {
+    font-size: $min-size;
+
+    @media screen and (min-width: $min-vw) {
+        font-size: calc(#{$min-size} + #{strip-unit($max-size - $min-size)} * ((100vw - #{$min-vw}) / #{strip-unit($max-vw - $min-vw)}));
+    }
+
+    @media screen and (min-width: $max-vw) {
+        font-size: $max-size;
+    }
+}
+
+// Strip unit helper
+@function strip-unit($number) {
+    @if type-of($number)=='number' and not unitless($number) {
+        @return $number / ($number * 0 + 1);
+    }
+
+    @return $number;
+}
+
+// Stagger delay helper for multiple children
+@mixin stagger-children($count: 5, $base-delay: 0.1s) {
+    @for $i from 1 through $count {
+        &:nth-child(#{$i}) {
+            animation-delay: calc(#{$base-delay} * #{$i});
+        }
+    }
+}
+
+// Media query helpers
+@mixin mobile {
+    @media (max-width: #{$breakpoint-md - 1px}) {
+        @content;
+    }
+}
+
+@mixin tablet {
+    @media (min-width: $breakpoint-md) and (max-width: #{$breakpoint-lg - 1px}) {
+        @content;
+    }
+}
+
+@mixin desktop {
+    @media (min-width: $breakpoint-lg) {
+        @content;
+    }
+}
+
+@mixin tablet-up {
+    @media (min-width: $breakpoint-md) {
+        @content;
+    }
+}
