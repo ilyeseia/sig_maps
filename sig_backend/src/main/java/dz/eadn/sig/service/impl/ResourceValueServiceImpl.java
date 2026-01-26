@@ -70,25 +70,25 @@ public class ResourceValueServiceImpl extends CommonServiceImpl<ResourceValue, R
 			ResourceValue resourceValue = resourceValueRepository
 					.save(resourceValueMapper.dtoToEntity(resourceValueDto));
 			if (resourceValueDto != null && resourceValueDto.getId() != null) {
-				if (resourceValueDto != null && resourceValueDto.getId() != null) {
-					String selectSql = "select f.slug, f.layer_id from sig.field f where f.resource_id = ?";
-					List<Map<String, Object>> affectedFields = jdbcTemplate.queryForList(selectSql,
-							resourceValueDto.getResourceId());
 
-					affectedFields.forEach(f -> {
-						String slug = (String) f.get("slug");
-						UUID layerId = (UUID) f.get("layer_id");
-						String val = resourceValueDto.getId() + ":" + resourceValueDto.getValue();
-						String path = "{\"" + slug + "\"}";
+				String selectSql = "select f.slug, f.layer_id from sig.field f where f.resource_id = ?";
+				List<Map<String, Object>> affectedFields = jdbcTemplate.queryForList(selectSql,
+						resourceValueDto.getResourceId());
 
-						String updateSql = "update sig.entity_element e SET properties = JSONB_SET(e.properties, ?::text[], to_jsonb(?::text)) "
-								+
-								"where e.layer_entity_element = ? and " +
-								"split_part(e.properties->> ?, ':', 1) = ?";
+				affectedFields.forEach(f -> {
+					String slug = (String) f.get("slug");
+					UUID layerId = (UUID) f.get("layer_id");
+					String val = resourceValueDto.getId() + ":" + resourceValueDto.getValue();
+					String path = "{\"" + slug + "\"}";
 
-						jdbcTemplate.update(updateSql, path, val, layerId, slug, resourceValueDto.getId().toString());
-					});
-				}
+					String updateSql = "update sig.entity_element e SET properties = JSONB_SET(e.properties, ?::text[], to_jsonb(?::text)) "
+							+
+							"where e.layer_entity_element = ? and " +
+							"split_part(e.properties->> ?, ':', 1) = ?";
+
+					jdbcTemplate.update(updateSql, path, val, layerId, slug, resourceValueDto.getId().toString());
+				});
+
 			}
 
 			return resourceValueMapper.entityToDto(resourceValue);
