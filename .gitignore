@@ -1,0 +1,44 @@
+# Git ignore for sig_maps project
+
+# Environment files with secrets
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Docker volumes
+volumes/
+data/
+
+# Logs
+logs/
+*.log
+
+# Backup files
+*.sql
+backup/
+
+# Node modules (frontend)
+sig_frontend/node_modules/
+
+# Build outputs
+sig_frontend/.nuxt/
+sig_frontend/dist/
+sig_backend/build/
+sig_backend/out/
+
+# Gradle
+sig_backend/.gradle/
+
+# temp files
+*.swp
+*.swo
+*~

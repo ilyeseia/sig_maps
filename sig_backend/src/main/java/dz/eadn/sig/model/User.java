@@ -73,6 +73,7 @@ public class User extends WITHUUID implements Serializable {
 	private String avatar;
 
 	@Schema(description = "password of  username.", required = true)
+	@com.fasterxml.jackson.annotation.JsonIgnore
 	private String password;
 
 	@Schema(description = "email", required = true)

@@ -59,12 +59,16 @@ public class UploadFileServiceImpl implements UploadFileService {
 
     @Override
     public byte[] loadFile(String fileName) throws IOException {
-        return Files.readAllBytes(resolvePath(null, fileName));
+        Path path = resolvePath(null, fileName);
+        if (Files.size(path) > 50 * 1024 * 1024) throw new IOException("File too large (>50MB)");
+        return Files.readAllBytes(path);
     }
 
     @Override
     public byte[] loadFile(String folderName, String fileName) throws IOException {
-        return Files.readAllBytes(resolvePath(folderName, fileName));
+        Path path = resolvePath(folderName, fileName);
+        if (Files.size(path) > 50 * 1024 * 1024) throw new IOException("File too large (>50MB)");
+        return Files.readAllBytes(path);
     }
 
     @Override
@@ -136,12 +140,32 @@ public class UploadFileServiceImpl implements UploadFileService {
 
     private Path resolvePath(String subFolder, String fileName) {
         Settings settings = settingsService.findByCode(CODE_FOLDER_IMAGES);
-        String basePath = (settings != null) ? settings.getValue() : "";
-        
-        Path path = Paths.get(basePath);
-        if (subFolder != null && !subFolder.isEmpty()) {
-            path = path.resolve(subFolder);
+        String basePathSetting = (settings != null) ? settings.getValue() : "";
+
+        // Default to a safe temp dir if setting is missing to prevent root access
+        if (basePathSetting == null || basePathSetting.isEmpty()) {
+             basePathSetting = System.getProperty("java.io.tmpdir");
         }
-        return (fileName != null) ? path.resolve(fileName) : path;
+        
+        Path basePath = Paths.get(basePathSetting).toAbsolutePath().normalize();
+        Path resolvedPath = basePath;
+        
+        if (subFolder != null && !subFolder.isEmpty()) {
+            resolvedPath = resolvedPath.resolve(subFolder);
+        }
+        return getSafePath(fileName, basePath, resolvedPath);
+    }
+
+    private Path getSafePath(String fileName, Path basePath, Path resolvedPath) {
+        if (fileName != null && !fileName.isEmpty()) {
+            resolvedPath = resolvedPath.resolve(fileName);
+        }
+        
+        resolvedPath = resolvedPath.normalize();
+        
+        if (!resolvedPath.startsWith(basePath)) {
+             throw new SecurityException("Access denied: Path traversal attempt detected.");
+        }
+        return resolvedPath;
     }
 }
