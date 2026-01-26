@@ -58,17 +58,19 @@ public class UploadFileServiceImpl implements UploadFileService {
     }
 
     @Override
-    public byte[] loadFile(String fileName) throws IOException {
+    public InputStream loadFile(String fileName) throws IOException {
         Path path = resolvePath(null, fileName);
-        if (Files.size(path) > 50 * 1024 * 1024) throw new IOException("File too large (>50MB)");
-        return Files.readAllBytes(path);
+        if (Files.size(path) > 50 * 1024 * 1024)
+            throw new IOException("File too large (>50MB)");
+        return Files.newInputStream(path);
     }
 
     @Override
-    public byte[] loadFile(String folderName, String fileName) throws IOException {
+    public InputStream loadFile(String folderName, String fileName) throws IOException {
         Path path = resolvePath(folderName, fileName);
-        if (Files.size(path) > 50 * 1024 * 1024) throw new IOException("File too large (>50MB)");
-        return Files.readAllBytes(path);
+        if (Files.size(path) > 50 * 1024 * 1024)
+            throw new IOException("File too large (>50MB)");
+        return Files.newInputStream(path);
     }
 
     @Override
@@ -83,8 +85,9 @@ public class UploadFileServiceImpl implements UploadFileService {
 
     @Override
     public void deleteFilesListOfDirectory(String folderName, List<String> filesToKeep) throws IOException {
-        if (filesToKeep == null) return;
-        
+        if (filesToKeep == null)
+            return;
+
         List<String> existingFiles = getFilesListOfDirectory(folderName);
         existingFiles.removeAll(filesToKeep); // Calculate files to delete
 
@@ -99,9 +102,9 @@ public class UploadFileServiceImpl implements UploadFileService {
         if (Files.exists(targetPath)) {
             // Recursive delete
             Files.walk(targetPath)
-                .sorted(Comparator.reverseOrder())
-                .map(Path::toFile)
-                .forEach(File::delete);
+                    .sorted(Comparator.reverseOrder())
+                    .map(Path::toFile)
+                    .forEach(File::delete);
         }
     }
 
@@ -116,9 +119,9 @@ public class UploadFileServiceImpl implements UploadFileService {
         try {
             if (Files.exists(dir) && Files.isDirectory(dir)) {
                 return Files.list(dir)
-                    .filter(Files::isRegularFile)
-                    .map(p -> p.getFileName().toString())
-                    .collect(Collectors.toList());
+                        .filter(Files::isRegularFile)
+                        .map(p -> p.getFileName().toString())
+                        .collect(Collectors.toList());
             }
         } catch (IOException e) {
             log.error("Error listing files in " + folderPath, e);
@@ -131,10 +134,10 @@ public class UploadFileServiceImpl implements UploadFileService {
     private String saveFile(InputStream inputStream, String extension, String subFolder) throws IOException {
         String fileName = UUID.randomUUID().toString().toLowerCase() + "." + extension;
         Path path = resolvePath(subFolder, fileName);
-        
+
         Files.createDirectories(path.getParent());
         Files.copy(inputStream, path);
-        
+
         return fileName;
     }
 
@@ -144,12 +147,12 @@ public class UploadFileServiceImpl implements UploadFileService {
 
         // Default to a safe temp dir if setting is missing to prevent root access
         if (basePathSetting == null || basePathSetting.isEmpty()) {
-             basePathSetting = System.getProperty("java.io.tmpdir");
+            basePathSetting = System.getProperty("java.io.tmpdir");
         }
-        
+
         Path basePath = Paths.get(basePathSetting).toAbsolutePath().normalize();
         Path resolvedPath = basePath;
-        
+
         if (subFolder != null && !subFolder.isEmpty()) {
             resolvedPath = resolvedPath.resolve(subFolder);
         }
@@ -160,11 +163,11 @@ public class UploadFileServiceImpl implements UploadFileService {
         if (fileName != null && !fileName.isEmpty()) {
             resolvedPath = resolvedPath.resolve(fileName);
         }
-        
+
         resolvedPath = resolvedPath.normalize();
-        
+
         if (!resolvedPath.startsWith(basePath)) {
-             throw new SecurityException("Access denied: Path traversal attempt detected.");
+            throw new SecurityException("Access denied: Path traversal attempt detected.");
         }
         return resolvedPath;
     }

@@ -1,6 +1,7 @@
 package dz.eadn.sig.api.v1;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
@@ -61,7 +62,8 @@ public class UploadFileController {
     @PutMapping("/delete/{folderName}")
     public ResponseEntity<?> deleteListFiles(@PathVariable String folderName,
             @RequestBody List<String> arrayFilesNames) {
-        return handleDelete(() -> fileService.deleteFilesListOfDirectory(sanitizeFolderName(folderName), arrayFilesNames));
+        return handleDelete(
+                () -> fileService.deleteFilesListOfDirectory(sanitizeFolderName(folderName), arrayFilesNames));
     }
 
     @GetMapping("/download/{fileName}")
@@ -77,7 +79,8 @@ public class UploadFileController {
     // --- Helper Methods ---
 
     private String sanitizeFolderName(String folderName) {
-        // Replaces dots with slashes for nested folders structure (e.g. id_layers.id_feature -> id_layers/id_feature)
+        // Replaces dots with slashes for nested folders structure (e.g.
+        // id_layers.id_feature -> id_layers/id_feature)
         return folderName.replace(".", "/");
     }
 
@@ -86,9 +89,9 @@ public class UploadFileController {
             return ResponseEntity.ok().body("please select a full file!");
         }
         try {
-            String fileName = (folderName == null) 
-                ? fileService.uploadFile(file) 
-                : fileService.uploadFile(folderName, file);
+            String fileName = (folderName == null)
+                    ? fileService.uploadFile(file)
+                    : fileService.uploadFile(folderName, file);
             return ResponseEntity.ok().body(fileName);
         } catch (IOException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -100,9 +103,11 @@ public class UploadFileController {
             if (fileName == null || fileName.isEmpty()) {
                 throw new IOException("File name is empty/invalid");
             }
-            byte[] file = fileService.loadFile(folderName, fileName);
+            InputStream file = fileService.loadFile(folderName, fileName);
             String mimeType = Files.probeContentType(Paths.get(fileName));
-            return ResponseEntity.ok().header("content-type", mimeType).body(file);
+            return ResponseEntity.ok()
+                    .header("content-type", mimeType)
+                    .body(new org.springframework.core.io.InputStreamResource(file));
         } catch (IOException e) {
             return ResponseEntity.badRequest().body("Please provide the name of file !");
         }
