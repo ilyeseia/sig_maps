@@ -19,7 +19,8 @@ module.exports = {
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { hid: 'description', name: 'description', content: pkg.description }
+      { hid: 'description', name: 'description', content: pkg.description },
+      { httpEquiv: 'Content-Security-Policy', content: "default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data:; img-src 'self' https: data: blob:; font-src 'self' https: data:;" }
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/kharitadz-logo-offecial.ico' },

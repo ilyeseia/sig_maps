@@ -54,9 +54,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http	.cors()
+		http.cors()
 				.and()
 				.csrf().disable()
+				.headers()
+				.frameOptions().sameOrigin()
+				.xssProtection().block(true)
+				.and()
+				.contentTypeOptions()
+				.and()
+				.httpStrictTransportSecurity().includeSubDomains(true).maxAgeInSeconds(31536000)
+				.and()
+				.and()
 				.exceptionHandling().authenticationEntryPoint(unauthorizedHandler)
 				.and()
 				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -76,7 +85,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 				.anyRequest()
 				.authenticated();
-
 
 		http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 	}

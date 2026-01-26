@@ -111,7 +111,8 @@ public class LoginController {
 			@ApiResponse(responseCode = "500", description = "Internal Server Error") })
 
 	@PostMapping("/login")
-	public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest, HttpServletRequest request) {
+	public ResponseEntity<?> authenticateUser(@javax.validation.Valid @RequestBody LoginRequest loginRequest,
+			HttpServletRequest request) {
 		Authentication authentication = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 

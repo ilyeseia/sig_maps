@@ -36,7 +36,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-
 import dz.eadn.sig.constants.Constants;
 import dz.eadn.sig.exceptions.AccessNotPermittedException;
 import dz.eadn.sig.exceptions.EntityAlreadyExistsException;
@@ -133,7 +132,6 @@ public class LayerServiceImpl extends CommonServiceImpl<Layer, LayerDto> impleme
 	@Autowired
 	private FilterRepository filterRepository;
 
-
 	public LayerServiceImpl() {
 		super(Layer.class);
 	}
@@ -186,7 +184,7 @@ public class LayerServiceImpl extends CommonServiceImpl<Layer, LayerDto> impleme
 				}
 			}
 
-			//Delete all layer styles in the geoserver
+			// Delete all layer styles in the geoserver
 			layerStylesService.deleteStylesByLayer(layer);
 
 			String layerViewName = layer.getSlug() + "_view";
@@ -195,7 +193,7 @@ public class LayerServiceImpl extends CommonServiceImpl<Layer, LayerDto> impleme
 			 * mapRepository.save(map); }
 			 */
 
-			//Delete all layer filters
+			// Delete all layer filters
 			layer.getUserLayerFilters().forEach(u -> {
 				filterRepository.delete(u.getFilter());
 			});
@@ -205,9 +203,9 @@ public class LayerServiceImpl extends CommonServiceImpl<Layer, LayerDto> impleme
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			try{
+			try {
 				jdbcTemplate.execute("DROP VIEW IF EXISTS \"" + layerViewName + "\"");
-			}catch (Exception e){
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 
@@ -257,17 +255,17 @@ public class LayerServiceImpl extends CommonServiceImpl<Layer, LayerDto> impleme
 		GeometryBuilder builder = new GeometryBuilder();
 		Geometry geom = null;
 		switch (layer.getTopo()) {
-		case "Point":
-			geom = builder.point();
-			break;
-		case "Polygon":
-			geom = builder.polygon();
-			break;
-		case "LineString":
-			geom = builder.lineString();
-			break;
-		case "MultiPolygon":
-			geom = builder.multiPolygon(null);
+			case "Point":
+				geom = builder.point();
+				break;
+			case "Polygon":
+				geom = builder.polygon();
+				break;
+			case "LineString":
+				geom = builder.lineString();
+				break;
+			case "MultiPolygon":
+				geom = builder.multiPolygon(null);
 		}
 
 		geom.setSRID(4326);
@@ -374,18 +372,18 @@ public class LayerServiceImpl extends CommonServiceImpl<Layer, LayerDto> impleme
 				geoserverService.updateLayer(oldLayerSlug, new SLDGeneratorImpl().createFeatureType(layerDto));
 			} catch (FeignException e) {
 				// If the layer does not exits: ROLLBACK
-				if(e.status() == 404){
+				if (e.status() == 404) {
 					jdbcTemplate.execute("DROP VIEW IF EXISTS " + oldLayerSlug + "_view");
 					this.createSqlView(layer);
 					layerDto.setSlug(Utils.toSlug(layerDto.getName()));
 					geoserverService.addLayer(new SLDGeneratorImpl().createFeatureType(layerDto));
-					try{
+					try {
 						geoserverService.deleteLayer(oldLayerSlug);
-					}catch (FeignException e1){
-						e1.getStackTrace();
+					} catch (FeignException e1) {
+						log.error("Error deleting old layer during update rollback", e1);
 					}
 					viewNeedUpdate = false;
-				}else{
+				} else {
 					throw new GlobalException("l'opération de la modification a échoué !");
 				}
 			}
@@ -410,7 +408,6 @@ public class LayerServiceImpl extends CommonServiceImpl<Layer, LayerDto> impleme
 			}
 		}
 
-
 		if (layer.getFields() != null) {
 			String qry1 = "UPDATE sig.entity_element SET properties = properties";
 			String oldSlug = "";
@@ -420,14 +417,16 @@ public class LayerServiceImpl extends CommonServiceImpl<Layer, LayerDto> impleme
 					// if the field already exists and dirty
 					if (!oldSlug.equals(Utils.toSlug(field.getName()))) {
 						field.setSlug(Utils.toSlug(field.getId().toString()));
-						String query = qry1 + "- '" + oldSlug.replaceAll("'", "''") + "' || jsonb_build_object('" + field.getSlug().replaceAll("'", "''")
-								+ "', properties->'" + oldSlug.replaceAll("'", "''") + "') where properties ? '" + oldSlug.replaceAll("'", "''")
+						String query = qry1 + "- '" + oldSlug.replaceAll("'", "''") + "' || jsonb_build_object('"
+								+ field.getSlug().replaceAll("'", "''")
+								+ "', properties->'" + oldSlug.replaceAll("'", "''") + "') where properties ? '"
+								+ oldSlug.replaceAll("'", "''")
 								+ "' and layer_entity_element = " + "'" + layer.getId() + "'";
-						try{
+						try {
 							jdbcTemplate.update(query);
 
-						}catch (Exception e){
-							e.getStackTrace();
+						} catch (Exception e) {
+							log.error("Error updating entity element properties for field slug update", e);
 						}
 					}
 				} else {
@@ -442,15 +441,16 @@ public class LayerServiceImpl extends CommonServiceImpl<Layer, LayerDto> impleme
 			String oldSlug = f.getSlug();
 			f.setSlug(Utils.toSlug(f.getName()));
 			String query = "UPDATE sig.entity_element SET properties = properties - '" + oldSlug.replaceAll("'", "''")
-					+ "' || jsonb_build_object('" + f.getSlug().replaceAll("'", "''") + "', properties->'" + oldSlug.replaceAll("'", "''")
-					+ "') where properties ? '" + oldSlug.replaceAll("'", "''") + "' and layer_entity_element = " + "'" + layer.getId() + "'";
-			try{
+					+ "' || jsonb_build_object('" + f.getSlug().replaceAll("'", "''") + "', properties->'"
+					+ oldSlug.replaceAll("'", "''")
+					+ "') where properties ? '" + oldSlug.replaceAll("'", "''") + "' and layer_entity_element = " + "'"
+					+ layer.getId() + "'";
+			try {
 				jdbcTemplate.update(query);
-			}catch (Exception e){
-				e.printStackTrace();
+			} catch (Exception e) {
+				log.error("Error updating field slugs switch", e);
 			}
 		});
-
 
 		Layer savedLayer = layerRepository.save(layer);
 		LayerDto saveLayerDto = luMapper.entityToDto(savedLayer);
@@ -511,7 +511,8 @@ public class LayerServiceImpl extends CommonServiceImpl<Layer, LayerDto> impleme
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		String username = authentication.getName();
 		User owner = userService.findByUsername(username);
-		if(owner != null && layerDto.getUserDtos() != null &&  layerDto.getUserDtos().stream().noneMatch(u -> u.getEmail().equals(owner.getEmail()))){
+		if (owner != null && layerDto.getUserDtos() != null
+				&& layerDto.getUserDtos().stream().noneMatch(u -> u.getEmail().equals(owner.getEmail()))) {
 			layer.getUsers().add(owner);
 		}
 		Layer savedLayer = layerRepository.save(layer);
@@ -635,16 +636,24 @@ public class LayerServiceImpl extends CommonServiceImpl<Layer, LayerDto> impleme
 			Layer savedLayer = layerRepository.save(layer);
 			LayerSimpleDto layerSimpleDto = modelMapper.map(savedLayer, LayerSimpleDto.class);
 
-			//Audit share layer action
+			// Audit share layer action
 			List<java.util.Map<String, String>> properties = new ArrayList<>();
 			java.util.Map<String, String> property = new LinkedHashMap<>();
 			property.put("attribute", "users");
-			property.put("addedValues", sharedLayer.getUsers().stream().filter(u -> u.getIsNew() != null &&  u.getIsNew()).map(WITHUUID::getId).collect(Collectors.toList()).toString());
-			property.put("deletedValues", sharedLayer.getUsers().stream().filter(u -> u.getToDelete() != null &&  u.getToDelete()).map(WITHUUID::getId).collect(Collectors.toList()).toString());
+			property.put("addedValues",
+					sharedLayer.getUsers().stream().filter(u -> u.getIsNew() != null && u.getIsNew())
+							.map(WITHUUID::getId).collect(Collectors.toList()).toString());
+			property.put("deletedValues",
+					sharedLayer.getUsers().stream().filter(u -> u.getToDelete() != null && u.getToDelete())
+							.map(WITHUUID::getId).collect(Collectors.toList()).toString());
 			java.util.Map<String, String> property2 = new LinkedHashMap<>();
 			property2.put("attribute", "groups");
-			property2.put("addedValues", sharedLayer.getGroups().stream().filter(g -> g.getIsNew() != null &&  g.getIsNew()).map(WITHUUID::getId).collect(Collectors.toList()).toString());
-			property2.put("deletedValues", sharedLayer.getGroups().stream().filter(g -> g.getToDelete() != null &&  g.getToDelete()).map(WITHUUID::getId).collect(Collectors.toList()).toString());
+			property2.put("addedValues",
+					sharedLayer.getGroups().stream().filter(g -> g.getIsNew() != null && g.getIsNew())
+							.map(WITHUUID::getId).collect(Collectors.toList()).toString());
+			property2.put("deletedValues",
+					sharedLayer.getGroups().stream().filter(g -> g.getToDelete() != null && g.getToDelete())
+							.map(WITHUUID::getId).collect(Collectors.toList()).toString());
 			properties.add(property);
 			properties.add(property2);
 			userLoggedActionsService.createAudit(properties, id, "Layer");
@@ -1007,7 +1016,8 @@ public class LayerServiceImpl extends CommonServiceImpl<Layer, LayerDto> impleme
 		if (map != null) {
 			String query = mapService.buildLayersMapQuery(map.getId());
 			List<Map<String, Object>> mapLayers = jdbcTemplate.queryForList(query);
-			layerIds = mapLayers.stream().map(ml -> UUID.fromString(String.valueOf(ml.get("layers_id")))).collect(Collectors.toList());
+			layerIds = mapLayers.stream().map(ml -> UUID.fromString(String.valueOf(ml.get("layers_id"))))
+					.collect(Collectors.toList());
 			if (layerIds.size() > 0)
 				filterPre = cb.not(root.get("id").in(layerIds));
 		}
@@ -1194,68 +1204,76 @@ public class LayerServiceImpl extends CommonServiceImpl<Layer, LayerDto> impleme
 		return withFieldsAndResourceDto;
 	}
 
-//	@Override
-//	public ResponseEntity updateStyle(String layerSlug, StyleDto styleDto) {
-//		CheckIfUserHasPrivilegeOnLayer(layerSlug, null, "CONFIGURE_LAYER_STYLE_AUTHORITY", "write");
-//		Layer layer = layerRepository.findBySlug(layerSlug);
-//		layer.setSymbologyType(styleDto.getSymbologyType());
-//		layer.setLabelingEnabled(styleDto.isLabelEnabled());
-//		if (styleDto.getIconUrl() != null) {
-//			layer.setIconUrl(styleDto.getIconUrl());
-//		}
-//		try {
-//			geoserverService.updateStyle(layer.getSlug(),
-//					geoToolsService.createStyle(layer.getSlug(), layer.getTopo(), layer.getSymbologyType(), styleDto));
-//			ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-//			layer.setStyle(ow.writeValueAsString(styleDto));
-//			layerRepository.save(layer);
-//
-//			// prepare notifications
-//
-//			List<User> users = new ArrayList<>();
-//
-//			if (layer != null) {
-//
-//				users.addAll(layer.getUsers());
-//
-//				for (Group group : layer.getGroups()) {
-//					users.addAll(group.getUsers());
-//				}
-//
-//			}
-//
-//			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//
-//			String message = String.format(messages.getMessages().get("NM_LAYER_CHANGE_STYLE"), layer.getName(),
-//					authentication.getName());
-//
-//			SystemNotification systemNotification = createSystemNotification(Transaction.UPDATE, null);
-//
-//			NotificationSimpleDto notification = createNotification(NotificationLevel.INFO, Operation.CHANGEMENT_STYLE,
-//					message, systemNotification, users);
-//
-//			notificationMessageService.sendNotificationMessage(notification);
-//
-//		} catch (Exception e) {
-//			throw new GlobalException("L'opération de mise à jour du style a échoué");
-//		}
-//		return new ResponseEntity(modelMapper.map(layer, LayerSimpleWithFieldsDto.class), HttpStatus.ACCEPTED);
-//	}
+	// @Override
+	// public ResponseEntity updateStyle(String layerSlug, StyleDto styleDto) {
+	// CheckIfUserHasPrivilegeOnLayer(layerSlug, null,
+	// "CONFIGURE_LAYER_STYLE_AUTHORITY", "write");
+	// Layer layer = layerRepository.findBySlug(layerSlug);
+	// layer.setSymbologyType(styleDto.getSymbologyType());
+	// layer.setLabelingEnabled(styleDto.isLabelEnabled());
+	// if (styleDto.getIconUrl() != null) {
+	// layer.setIconUrl(styleDto.getIconUrl());
+	// }
+	// try {
+	// geoserverService.updateStyle(layer.getSlug(),
+	// geoToolsService.createStyle(layer.getSlug(), layer.getTopo(),
+	// layer.getSymbologyType(), styleDto));
+	// ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+	// layer.setStyle(ow.writeValueAsString(styleDto));
+	// layerRepository.save(layer);
+	//
+	// // prepare notifications
+	//
+	// List<User> users = new ArrayList<>();
+	//
+	// if (layer != null) {
+	//
+	// users.addAll(layer.getUsers());
+	//
+	// for (Group group : layer.getGroups()) {
+	// users.addAll(group.getUsers());
+	// }
+	//
+	// }
+	//
+	// Authentication authentication =
+	// SecurityContextHolder.getContext().getAuthentication();
+	//
+	// String message =
+	// String.format(messages.getMessages().get("NM_LAYER_CHANGE_STYLE"),
+	// layer.getName(),
+	// authentication.getName());
+	//
+	// SystemNotification systemNotification =
+	// createSystemNotification(Transaction.UPDATE, null);
+	//
+	// NotificationSimpleDto notification =
+	// createNotification(NotificationLevel.INFO, Operation.CHANGEMENT_STYLE,
+	// message, systemNotification, users);
+	//
+	// notificationMessageService.sendNotificationMessage(notification);
+	//
+	// } catch (Exception e) {
+	// throw new GlobalException("L'opération de mise à jour du style a échoué");
+	// }
+	// return new ResponseEntity(modelMapper.map(layer,
+	// LayerSimpleWithFieldsDto.class), HttpStatus.ACCEPTED);
+	// }
 
-//	@Override
-//	public String getStyle(String layerSlug, String mapSlug) {
-//		if(mapSlug != null){
-//			CheckIfUserHasPrivilegeOnLayer(layerSlug, mapSlug, null, "read");
-//		}else{
-//			CheckIfUserHasPrivilegeOnLayer(layerSlug, null, null, "write");
-//		}
-//		Layer layer = layerRepository.findBySlug(layerSlug);
-//		try {
-//			return layer.getStyle();
-//		} catch (Exception e) {
-//			throw new GlobalException("impossible de récupérer le style de la couche");
-//		}
-//	}
+	// @Override
+	// public String getStyle(String layerSlug, String mapSlug) {
+	// if(mapSlug != null){
+	// CheckIfUserHasPrivilegeOnLayer(layerSlug, mapSlug, null, "read");
+	// }else{
+	// CheckIfUserHasPrivilegeOnLayer(layerSlug, null, null, "write");
+	// }
+	// Layer layer = layerRepository.findBySlug(layerSlug);
+	// try {
+	// return layer.getStyle();
+	// } catch (Exception e) {
+	// throw new GlobalException("impossible de récupérer le style de la couche");
+	// }
+	// }
 
 	@Override
 	public PageDto<UserSimpleDto> getUsersSharingLayer(Layer layer, Integer page, Integer limit, String sort,
@@ -1421,13 +1439,12 @@ public class LayerServiceImpl extends CommonServiceImpl<Layer, LayerDto> impleme
 					throw new AccessNotPermittedException(
 							"vous ne disposez pas de suffisamment de privilèges pour effectuer cette action !");
 				}
-				if(user.get().getLayers().stream().anyMatch(l -> l.getSlug().equals(layer.getSlug()))){
+				if (user.get().getLayers().stream().anyMatch(l -> l.getSlug().equals(layer.getSlug()))) {
 					return true;
-				}
-				else if(layerRepository.checkIfLayerSharedWithUserGroups(user.get().getId(), layer.getId()) > 0){
+				} else if (layerRepository.checkIfLayerSharedWithUserGroups(user.get().getId(), layer.getId()) > 0) {
 					return true;
-				}
-				else if (layerRepository.checkIfLayerBelongsToUserMap(user.get().getId(), mapSlug, layer.getId()) > 0) {
+				} else if (layerRepository.checkIfLayerBelongsToUserMap(user.get().getId(), mapSlug,
+						layer.getId()) > 0) {
 					return true;
 				} else if (layerRepository.checkIfLayerBelongsToUserGroupsMap(user.get().getId(), mapSlug,
 						layer.getId()) > 0) {
@@ -1440,28 +1457,31 @@ public class LayerServiceImpl extends CommonServiceImpl<Layer, LayerDto> impleme
 	}
 
 	@Override
-	public boolean CheckIfUserHasPrivilegeOnLayerAndEntityElement(String layerSlug, String mapSlug, String permission, String mode, UUID entityElementId) {
-		if(entityElementId != null && CheckIfUserHasPrivilegeOnLayer(layerSlug, mapSlug, permission, mode) && entityElementService.isAuthorizedArea(entityElementService.findById(entityElementId).getGeom())){
+	public boolean CheckIfUserHasPrivilegeOnLayerAndEntityElement(String layerSlug, String mapSlug, String permission,
+			String mode, UUID entityElementId) {
+		if (entityElementId != null && CheckIfUserHasPrivilegeOnLayer(layerSlug, mapSlug, permission, mode)
+				&& entityElementService.isAuthorizedArea(entityElementService.findById(entityElementId).getGeom())) {
 			return true;
-		}else{
+		} else {
 			throw new AccessNotPermittedException(
 					"vous ne disposez pas de suffisamment de privilèges pour effectuer cette action !");
 		}
 	}
 
 	@Override
-	public List<ButtonPermission> CheckIfUserHasPrivilegeOnLayerAndEntityElements(List<ButtonPermission> buttonPermissions) {
-		for(ButtonPermission buttonPermission: buttonPermissions){
-			try{
-				CheckIfUserHasPrivilegeOnLayerAndEntityElement(buttonPermission.getLayerSlug(), null, buttonPermission.getPermission(), "write", buttonPermission.getEntityElementId());
+	public List<ButtonPermission> CheckIfUserHasPrivilegeOnLayerAndEntityElements(
+			List<ButtonPermission> buttonPermissions) {
+		for (ButtonPermission buttonPermission : buttonPermissions) {
+			try {
+				CheckIfUserHasPrivilegeOnLayerAndEntityElement(buttonPermission.getLayerSlug(), null,
+						buttonPermission.getPermission(), "write", buttonPermission.getEntityElementId());
 				buttonPermission.setIsAllowed(true);
-			}catch (Exception e){
+			} catch (Exception e) {
 				buttonPermission.setIsAllowed(false);
 			}
 		}
 		return buttonPermissions;
 	}
-
 
 	@Override
 	public boolean checkIfMapSharedWithUser(UUID mapId) {
@@ -1515,8 +1535,8 @@ public class LayerServiceImpl extends CommonServiceImpl<Layer, LayerDto> impleme
 		return systemNotification;
 	}
 
-	public String generateQuery(String fieldType, SearchCriteria criteria, boolean fullQuery){
-		return buildQuery(fieldType,  criteria,  fullQuery);
+	public String generateQuery(String fieldType, SearchCriteria criteria, boolean fullQuery) {
+		return buildQuery(fieldType, criteria, fullQuery);
 	}
 
 	@Override
@@ -1529,24 +1549,28 @@ public class LayerServiceImpl extends CommonServiceImpl<Layer, LayerDto> impleme
 
 		LayerDto savedLayer = save(clonedLayer);
 		ShareLayerWithOthers shareLayerWithOthers = new ShareLayerWithOthers();
-		if(cloneLayerDto.getCloneUsers()){
-			String username =  SecurityContextHolder.getContext().getAuthentication().getName();
-			List<UserDto> userDtoList =  cModelMapper.mapList(layer.getUsers(), UserDto.class);
+		if (cloneLayerDto.getCloneUsers()) {
+			String username = SecurityContextHolder.getContext().getAuthentication().getName();
+			List<UserDto> userDtoList = cModelMapper.mapList(layer.getUsers(), UserDto.class);
 			userDtoList.forEach(u -> {
 				u.setIsNew(true);
 				u.setPassword(null);
 			});
-			shareLayerWithOthers.setUsers(userDtoList.stream().filter(u -> !u.getUsername().equals(username)).collect(Collectors.toList()));
+			shareLayerWithOthers.setUsers(
+					userDtoList.stream().filter(u -> !u.getUsername().equals(username)).collect(Collectors.toList()));
 		}
-		if(cloneLayerDto.getCloneGroups()){
+		if (cloneLayerDto.getCloneGroups()) {
 			List<GroupDto> groupDtoList = cModelMapper.mapList(layer.getGroups(), GroupDto.class);
 			groupDtoList.forEach(m -> m.setIsNew(true));
 			shareLayerWithOthers.setGroups(groupDtoList);
 		}
 		shareLayer(savedLayer.getId(), shareLayerWithOthers);
 		String query = "INSERT INTO sig.entity_element(id, \n" +
-				"\t create_date, created_by, deleted, last_modified_date, modified_by, geom, properties, layer_entity_element)\n" +
-				"\tselect md5(random()::text || clock_timestamp()::text)::uuid, e.create_date, e.created_by, e.deleted, e.last_modified_date, e.modified_by, e.geom, e.properties, '" + savedLayer.getId() + "' from sig.entity_element e where e.layer_entity_element =  '" + layer.getId() + "'";
+				"\t create_date, created_by, deleted, last_modified_date, modified_by, geom, properties, layer_entity_element)\n"
+				+
+				"\tselect md5(random()::text || clock_timestamp()::text)::uuid, e.create_date, e.created_by, e.deleted, e.last_modified_date, e.modified_by, e.geom, e.properties, '"
+				+ savedLayer.getId() + "' from sig.entity_element e where e.layer_entity_element =  '" + layer.getId()
+				+ "'";
 		jdbcTemplate.execute(query);
 		return savedLayer;
 	}
@@ -1554,11 +1578,11 @@ public class LayerServiceImpl extends CommonServiceImpl<Layer, LayerDto> impleme
 	@Override
 	public Boolean checkIfLayerHasData(UUID layerId) {
 		String query = "select 1 as contain where exists (select e.id from sig.entity_element e where e.deleted = false and e.layer_entity_element = ?)";
-	 	try{
-			jdbcTemplate.queryForObject(query, new Object[] { layerId }, String.class );
+		try {
+			jdbcTemplate.queryForObject(query, new Object[] { layerId }, String.class);
 			return true;
-		}catch (Exception e){
-	 		return false;
+		} catch (Exception e) {
+			return false;
 		}
 	}
 

@@ -84,6 +84,7 @@ public class UserServiceImpl extends CommonServiceImpl<User, UserDto> implements
 	private SettingsService settingsService;
 
 	@Autowired
+	@org.springframework.context.annotation.Lazy
 	private UserNotificationService userNotificationService;
 
 	@Value("${spring.mail.username}")
@@ -240,7 +241,7 @@ public class UserServiceImpl extends CommonServiceImpl<User, UserDto> implements
 				Settings settings = settingsService.findByCode("SERVER_ADDRESS");
 
 				if (savedUser != null) {
-					//Remove all user group temporary
+					// Remove all user group temporary
 					savedUser.setGroups(new ArrayList<>());
 					updateUserGroups(userDto, savedUser);
 					try {
@@ -279,21 +280,21 @@ public class UserServiceImpl extends CommonServiceImpl<User, UserDto> implements
 
 	}
 
-	public void updateUserGroups(UserDto userDto, User user){
-		if(userDto.getGroupDtos() != null) {
+	public void updateUserGroups(UserDto userDto, User user) {
+		if (userDto.getGroupDtos() != null) {
 			List<Group> groupList = cModelMapper.mapList(userDto.getGroupDtos(), Group.class);
 			user.getGroups().stream().filter(g -> !groupList.contains(g)).forEach(group -> {
 				addDeleteUserGroup(group, user, "delete");
 			});
 			groupList.forEach(group -> {
-			if (user.getGroups().stream().noneMatch(g -> g.getId().equals(group.getId()))) {
+				if (user.getGroups().stream().noneMatch(g -> g.getId().equals(group.getId()))) {
 					addDeleteUserGroup(group, user, "add");
 				}
 			});
 		}
 	}
 
-	public void addDeleteUserGroup(Group group, User user,  String action){
+	public void addDeleteUserGroup(Group group, User user, String action) {
 		GroupDto groupDto = new GroupDto();
 		groupDto.setUserDtos(new ArrayList<>());
 		groupDto.setId(group.getId());
@@ -301,9 +302,9 @@ public class UserServiceImpl extends CommonServiceImpl<User, UserDto> implements
 		UserDto userDto1 = new UserDto();
 		userDto1.setId(user.getId());
 		userDto1.setUsername(user.getUsername());
-		if(action.equals("add")){
+		if (action.equals("add")) {
 			userDto1.setIsNew(true);
-		}else{
+		} else {
 			userDto1.setToDelete(true);
 		}
 		groupDto.getUserDtos().add(userDto1);
@@ -364,7 +365,7 @@ public class UserServiceImpl extends CommonServiceImpl<User, UserDto> implements
 		return userPage;
 	}
 
-//	@Transactional
+	// @Transactional
 	@Override
 	public void resetPassword(UUID userId, String newPassword) {
 
