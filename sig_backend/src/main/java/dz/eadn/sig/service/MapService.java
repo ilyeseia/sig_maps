@@ -45,7 +45,8 @@ public interface MapService extends CommonService<Map, MapDto> {
 
 	public List<HashMap<String, String>> getAllLayersMap(UUID mapId, boolean isPublic);
 
-//	public List<LayerSimpleWithFieldsDto> getLayersSimpleWithFieldsInMap(UUID mapId);
+	// public List<LayerSimpleWithFieldsDto> getLayersSimpleWithFieldsInMap(UUID
+	// mapId);
 
 	public List<LayerSimpleWithFieldsDto> getLayersSimpleWithFields(UUID mapId, boolean authenticated);
 
@@ -59,7 +60,7 @@ public interface MapService extends CommonService<Map, MapDto> {
 
 	public MapSimpleDto cloneMap(String mapSlug, CloneMapDto cloneMapDto);
 
-	public String buildLayersMapQuery(UUID mapId);
+	public String buildLayersMapQuery();
 
 	public Boolean checkIfThemeContainLayer(UUID themeId, UUID layerId);
 

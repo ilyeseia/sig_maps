@@ -133,12 +133,11 @@ public class MapServiceImpl extends CommonServiceImpl<dz.eadn.sig.model.Map, Map
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 
-
 	public MapServiceImpl() {
 		super(dz.eadn.sig.model.Map.class);
 	}
 
-	public void addRule(String layerSlug){
+	public void addRule(String layerSlug) {
 		HashMap<String, String> rules = new HashMap<>();
 		rules.put(workspace + "." + layerSlug + ".r", geoserverGuestRole);
 		try {
@@ -146,19 +145,17 @@ public class MapServiceImpl extends CommonServiceImpl<dz.eadn.sig.model.Map, Map
 			rules.clear();
 		} catch (FeignException e) {
 			if (e.status() != 1) {
-				e.printStackTrace();
+				log.error("Error adding GeoServer security rule", e);
 				rules.clear();
 			}
 		}
 	}
-
 
 	public MapSimpleDto shareMap(UUID id, ShareMapWithOthers sharedMap) {
 
 		dz.eadn.sig.model.Map map = this.findById(id);
 
 		MapSimpleDto mapSimpleDto = null;
-
 
 		Privacy oldPrivacy = map.getPrivacy();
 
@@ -177,7 +174,7 @@ public class MapServiceImpl extends CommonServiceImpl<dz.eadn.sig.model.Map, Map
 						}
 					} catch (FeignException e) {
 						if (e.status() != 1) {
-							e.printStackTrace();
+							log.error("Error removing GeoServer security rule for layer: " + l.getLayer().getSlug(), e);
 						}
 					}
 				});
@@ -249,24 +246,27 @@ public class MapServiceImpl extends CommonServiceImpl<dz.eadn.sig.model.Map, Map
 				map.setPrivacy(sharedMap.getPrivacy());
 			}
 
-
 			Map savedMap = mapRepository.save(map);
 
-
-			//Audit share map action
+			// Audit share map action
 			List<java.util.Map<String, String>> properties = new ArrayList<>();
 			java.util.Map<String, String> property = new LinkedHashMap<>();
 			property.put("attribute", "users");
-			property.put("addedValues", sharedMap.getUsers().stream().filter(u -> u.getIsNew() != null &&  u.getIsNew()).map(WITHUUID::getId).collect(Collectors.toList()).toString());
-			property.put("deletedValues", sharedMap.getUsers().stream().filter(u -> u.getToDelete() != null &&  u.getToDelete()).collect(Collectors.toList()).toString());
+			property.put("addedValues", sharedMap.getUsers().stream().filter(u -> u.getIsNew() != null && u.getIsNew())
+					.map(WITHUUID::getId).collect(Collectors.toList()).toString());
+			property.put("deletedValues", sharedMap.getUsers().stream()
+					.filter(u -> u.getToDelete() != null && u.getToDelete()).collect(Collectors.toList()).toString());
 			java.util.Map<String, String> property2 = new LinkedHashMap<>();
 			property2.put("attribute", "groups");
-			property2.put("addedValues", sharedMap.getGroups().stream().filter(g -> g.getIsNew() != null &&  g.getIsNew()).map(WITHUUID::getId).collect(Collectors.toList()).toString());
-			property2.put("deletedValues", sharedMap.getGroups().stream().filter(g -> g.getToDelete() != null &&  g.getToDelete()).map(WITHUUID::getId).collect(Collectors.toList()).toString());
+			property2.put("addedValues",
+					sharedMap.getGroups().stream().filter(g -> g.getIsNew() != null && g.getIsNew())
+							.map(WITHUUID::getId).collect(Collectors.toList()).toString());
+			property2.put("deletedValues",
+					sharedMap.getGroups().stream().filter(g -> g.getToDelete() != null && g.getToDelete())
+							.map(WITHUUID::getId).collect(Collectors.toList()).toString());
 			properties.add(property);
 			properties.add(property2);
 			userLoggedActionsService.createAudit(properties, id, "Map");
-
 
 			mapSimpleDto = modelMapper.map(savedMap, MapSimpleDto.class);
 
@@ -274,20 +274,20 @@ public class MapServiceImpl extends CommonServiceImpl<dz.eadn.sig.model.Map, Map
 
 				String privacy = "";
 				switch (sharedMap.getPrivacy()) {
-				case PRIVATE: {
-					privacy = "Priv�";
-					break;
-				}
-				case PUBLIC: {
-					privacy = "Publique";
-					break;
-				}
-				case PUBLIC_WITH_LINK: {
-					privacy = "Partag� avec lien";
-					break;
-				}
-				default:
-					break;
+					case PRIVATE: {
+						privacy = "Priv�";
+						break;
+					}
+					case PUBLIC: {
+						privacy = "Publique";
+						break;
+					}
+					case PUBLIC_WITH_LINK: {
+						privacy = "Partag� avec lien";
+						break;
+					}
+					default:
+						break;
 				}
 
 				SystemNotification systemNotification = createSystemNotification(Transaction.UPDATE, mapSimpleDto);
@@ -345,7 +345,7 @@ public class MapServiceImpl extends CommonServiceImpl<dz.eadn.sig.model.Map, Map
 			throw new EntityNotFoundException("Impossible de supprimer l'entité " + domainClass.getSimpleName());
 		}
 
-		//Delete all layer styles on this map from the geoserver
+		// Delete all layer styles on this map from the geoserver
 		layerStylesService.deleteStylesByMap(map);
 
 		mapRepository.delete(map);
@@ -364,19 +364,24 @@ public class MapServiceImpl extends CommonServiceImpl<dz.eadn.sig.model.Map, Map
 		notificationMessageService.sendNotificationMessage(notification);
 	}
 
-	// get all layers joined bbox
 	public ReferencedEnvelope getMapBBOX(dz.eadn.sig.model.Map map) {
-		Optional<String> layers = map.getLayers().stream().map(mp -> "'" + mp.getLayer().toString() + "'")
-				.reduce((a, b) -> a + ',' + b);
+		if (map.getLayers() == null || map.getLayers().isEmpty()) {
+			return null;
+		}
+		List<UUID> layerIds = map.getLayers().stream()
+				.map(ml -> ml.getLayer().getId())
+				.collect(Collectors.toList());
+
 		Geometry geom = null;
 		try {
 			geom = (Geometry) entityManager.createNativeQuery(
-					"select st_setsrid(st_extent(entityelem0_.geom),4326) as geom from sig.entity_element entityelem0_ where entityelem0_.layer_entity_element in ('646135cd-76b9-4fb6-97da-a485d4d6d20d' , '4b224824-033c-4602-b864-f54bad0bcad2')")
-					// .setParameter("layers", layers.get())
+					"select st_setsrid(st_extent(entityelem0_.geom),4326) as geom from sig.entity_element entityelem0_ where entityelem0_.layer_entity_element in (:layerIds)")
+					.setParameter("layerIds", layerIds)
 					.unwrap(org.hibernate.query.NativeQuery.class)
 					.addScalar("geom", new JTSGeometryType(PGGeometryTypeDescriptor.INSTANCE)).getSingleResult();
 		} catch (Exception e) {
-			log.error(e.getMessage());
+			log.error("Error calculating BBOX for map: " + map.getId(), e);
+			return null;
 		}
 
 		CoordinateReferenceSystem crs = null;
@@ -691,55 +696,67 @@ public class MapServiceImpl extends CommonServiceImpl<dz.eadn.sig.model.Map, Map
 
 	public List<UUID> getLayersInMap(UUID mapId) {
 		String query = "with styles_in_theme as \n" +
-				"(select s.id from sig.style s where s.theme_style_id = (select t.id from sig.theme t inner join sig.map m  on m.id = t.theme_map where t.is_default = true and  m.id = '"+mapId+"' \n" +
+				"(select s.id from sig.style s where s.theme_style_id = (select t.id from sig.theme t inner join sig.map m  on m.id = t.theme_map where t.is_default = true and  m.id = ? \n"
+				+
 				")),\n" +
-				" layer_map_style as (select s.layer_map_style from styles_in_theme st inner join sig.style s on s.id = st.id),\n" +
-				"layer_ids as(select ml.layers_id from sig.map_layers ml where ml.map_layer_id in (select * from layer_map_style))\n" +
+				" layer_map_style as (select s.layer_map_style from styles_in_theme st inner join sig.style s on s.id = st.id),\n"
+				+
+				"layer_ids as(select ml.layers_id from sig.map_layers ml where ml.map_layer_id in (select * from layer_map_style))\n"
+				+
 				"select l.id from sig.layer l inner join layer_ids ld on l.id = ld.layers_id";
-		List<UUID> layerIds = jdbcTemplate.queryForList(query, UUID.class);
-
-		return layerIds;
+		return jdbcTemplate.queryForList(query, UUID.class, mapId);
 	}
 
-	public List<HashMap<String, String>> getAllLayersMap(UUID mapId, boolean isPublic){
+	public List<HashMap<String, String>> getAllLayersMap(UUID mapId, boolean isPublic) {
 		try {
 			List<LayerProjection> layerProjectionList = layerRepository.findAllByIdInOrderByName(getLayersInMap(mapId));
 			List<HashMap<String, String>> layers = new ArrayList<>();
-			String query = buildLayersMapQuery(mapId);
-			List<java.util.Map<String, Object>> layersMaps = jdbcTemplate.queryForList(query);
-			List<LayerStyleSimpleDto> styles = layerStylesService.getDefaultStyleInLayerMap(layersMaps.stream().map(lm -> UUID.fromString(String.valueOf(lm.get("map_layer_id")))).collect(Collectors.toList()));
+			String query = buildLayersMapQuery();
+			List<java.util.Map<String, Object>> layersMaps = jdbcTemplate.queryForList(query, mapId);
+			List<LayerStyleSimpleDto> styles = layerStylesService.getDefaultStyleInLayerMap(layersMaps.stream()
+					.map(lm -> UUID.fromString(String.valueOf(lm.get("map_layer_id")))).collect(Collectors.toList()));
 			styles.forEach(s -> {
 				HashMap<String, String> layer = new HashMap();
 				layer.put("style", s.getName());
-				java.util.Map<String, Object> mapLayer  = layersMaps.stream().filter(l -> l.get("map_layer_id").equals(s.getMapLayer())).collect(Collectors.toList()).get(0);
+				java.util.Map<String, Object> mapLayer = layersMaps.stream()
+						.filter(l -> l.get("map_layer_id").equals(s.getMapLayer())).collect(Collectors.toList()).get(0);
 				if (mapLayer != null)
-					layer.put("layer", layerProjectionList.stream().filter(l -> l.getId().equals(UUID.fromString(mapLayer.get("layers_id").toString()))).collect(Collectors.toList()).get(0).getSlug());
-					layer.put("order", mapLayer.get("layer_order").toString());
-					layer.put("isVisible", mapLayer.get("is_visible").toString());
+					layer.put("layer", layerProjectionList.stream()
+							.filter(l -> l.getId().equals(UUID.fromString(mapLayer.get("layers_id").toString())))
+							.collect(Collectors.toList()).get(0).getSlug());
+				layer.put("order", mapLayer.get("layer_order").toString());
+				layer.put("isVisible", mapLayer.get("is_visible").toString());
 				layers.add(layer);
 			});
 			return layers;
-		}catch (Exception e){
-			throw new RuntimeException("Une erreur inattendue s'est produite !");
+		} catch (Exception e) {
+			log.error("Unexpected error in getAllLayersMap", e);
+			throw new RuntimeException("Une erreur inattendue s'est produite !", e);
 		}
 	}
 
-
 	@Override
 	public List<LayerSimpleWithFieldsDto> getLayersSimpleWithFields(UUID mapId, boolean authenticated) {
-		try{
-			List<LayerSimpleWithFieldsDto> withFieldsDtos = cModelMapper.mapList(layerRepository.findAllByIdIn(getLayersInMap(mapId)),
+		try {
+			List<LayerSimpleWithFieldsDto> withFieldsDtos = cModelMapper.mapList(
+					layerRepository.findAllByIdIn(getLayersInMap(mapId)),
 					LayerSimpleWithFieldsDto.class);
-			String query = buildLayersMapQuery(mapId);
-			List<java.util.Map<String, Object>> layersMaps = jdbcTemplate.queryForList(query);
-			List<LayerStyleSimpleDto> styles = layerStylesService.getDefaultStyleInLayerMap(layersMaps.stream().map(lm -> UUID.fromString(String.valueOf(lm.get("map_layer_id")))).collect(Collectors.toList()));
-			if(styles != null && !styles.isEmpty()){
+			String query = buildLayersMapQuery();
+			List<java.util.Map<String, Object>> layersMaps = jdbcTemplate.queryForList(query, mapId);
+			List<LayerStyleSimpleDto> styles = layerStylesService.getDefaultStyleInLayerMap(layersMaps.stream()
+					.map(lm -> UUID.fromString(String.valueOf(lm.get("map_layer_id")))).collect(Collectors.toList()));
+			if (styles != null && !styles.isEmpty()) {
 				withFieldsDtos.forEach(l -> {
-					java.util.Map<String, Object> mapLayer = layersMaps.stream().filter(lm -> UUID.fromString(String.valueOf(lm.get("layers_id"))).equals(l.getId())).collect(Collectors.toList()).get(0);
-					if(mapLayer != null && !mapLayer.isEmpty())
-						l.setStyle(styles.stream().filter(s -> s.getMapLayer().equals(UUID.fromString(String.valueOf(mapLayer.get("map_layer_id"))))).collect(Collectors.toList()).get(0));
-						l.setOrder(Integer.parseInt(mapLayer.get("layer_order").toString()));
-						l.setVisible(Boolean.parseBoolean(mapLayer.get("is_visible").toString()));
+					java.util.Map<String, Object> mapLayer = layersMaps.stream()
+							.filter(lm -> UUID.fromString(String.valueOf(lm.get("layers_id"))).equals(l.getId()))
+							.collect(Collectors.toList()).get(0);
+					if (mapLayer != null && !mapLayer.isEmpty())
+						l.setStyle(styles.stream()
+								.filter(s -> s.getMapLayer()
+										.equals(UUID.fromString(String.valueOf(mapLayer.get("map_layer_id")))))
+								.collect(Collectors.toList()).get(0));
+					l.setOrder(Integer.parseInt(mapLayer.get("layer_order").toString()));
+					l.setVisible(Boolean.parseBoolean(mapLayer.get("is_visible").toString()));
 
 				});
 			}
@@ -763,59 +780,71 @@ public class MapServiceImpl extends CommonServiceImpl<dz.eadn.sig.model.Map, Map
 			}
 
 			return withFieldsDtos;
-		}catch (Exception e){
-			throw new RuntimeException("Une erreur inattendue s'est produite !");
+		} catch (Exception e) {
+			log.error("Unexpected error in getLayersSimpleWithFields", e);
+			throw new RuntimeException("Une erreur inattendue s'est produite !", e);
 		}
 	}
 
 	@Override
 	public List<LayerSimpleWithFieldsAndResourcesDto> getLayersSimpleWithFieldsAndResources(UUID mapId) {
-		try{
-			List<LayerSimpleWithFieldsAndResourcesDto> withFieldsAndResourcesDtos = cModelMapper.mapList(layerRepository.findAllByIdIn(getLayersInMap(mapId)),
+		try {
+			List<LayerSimpleWithFieldsAndResourcesDto> withFieldsAndResourcesDtos = cModelMapper.mapList(
+					layerRepository.findAllByIdIn(getLayersInMap(mapId)),
 					LayerSimpleWithFieldsAndResourcesDto.class);
-			String query = buildLayersMapQuery(mapId);
-			List<java.util.Map<String, Object>> layersMaps = jdbcTemplate.queryForList(query);
-			List<LayerStyleSimpleDto> styles = layerStylesService.getDefaultStyleInLayerMap(layersMaps.stream().map(lm -> UUID.fromString(String.valueOf(lm.get("map_layer_id")))).collect(Collectors.toList()));
-			if(styles != null && !styles.isEmpty()){
+			String query = buildLayersMapQuery();
+			List<java.util.Map<String, Object>> layersMaps = jdbcTemplate.queryForList(query, mapId);
+			List<LayerStyleSimpleDto> styles = layerStylesService.getDefaultStyleInLayerMap(layersMaps.stream()
+					.map(lm -> UUID.fromString(String.valueOf(lm.get("map_layer_id")))).collect(Collectors.toList()));
+			if (styles != null && !styles.isEmpty()) {
 				withFieldsAndResourcesDtos.forEach(l -> {
-					java.util.Map<String, Object> mapLayer = layersMaps.stream().filter(lm -> UUID.fromString(String.valueOf(lm.get("layers_id"))).equals(l.getId())).collect(Collectors.toList()).get(0);
-					if(mapLayer != null && !mapLayer.isEmpty())
+					java.util.Map<String, Object> mapLayer = layersMaps.stream()
+							.filter(lm -> UUID.fromString(String.valueOf(lm.get("layers_id"))).equals(l.getId()))
+							.collect(Collectors.toList()).get(0);
+					if (mapLayer != null && !mapLayer.isEmpty())
 						l.setOrder(Integer.parseInt(mapLayer.get("layer_order").toString()));
-						l.setVisible(Boolean.parseBoolean(mapLayer.get("is_visible").toString()));
-						l.setMapLayerId(UUID.fromString(mapLayer.get("map_layer_id").toString()));
-						List<LayerStyleSimpleDto> styleSimpleDtos = styles.stream().filter(s -> s.getMapLayer().equals(UUID.fromString(String.valueOf(mapLayer.get("map_layer_id"))))).collect(Collectors.toList());
-						if(styleSimpleDtos != null && !styleSimpleDtos.isEmpty()) l.setStyle(styleSimpleDtos.get(0));
+					l.setVisible(Boolean.parseBoolean(mapLayer.get("is_visible").toString()));
+					l.setMapLayerId(UUID.fromString(mapLayer.get("map_layer_id").toString()));
+					List<LayerStyleSimpleDto> styleSimpleDtos = styles.stream().filter(
+							s -> s.getMapLayer().equals(UUID.fromString(String.valueOf(mapLayer.get("map_layer_id")))))
+							.collect(Collectors.toList());
+					if (styleSimpleDtos != null && !styleSimpleDtos.isEmpty())
+						l.setStyle(styleSimpleDtos.get(0));
 				});
 			}
 			return withFieldsAndResourcesDtos;
-		}catch (Exception e){
-			throw new RuntimeException("Une erreur inattendue s'est produite !");
+		} catch (Exception e) {
+			log.error("Unexpected error in getLayersSimpleWithFieldsAndResources", e);
+			throw new RuntimeException("Une erreur inattendue s'est produite !", e);
 		}
 	}
 
 	@Override
-	public String buildLayersMapQuery(UUID mapId){
+	public String buildLayersMapQuery() {
 		return "with styles_in_theme as \n" +
-				"(select s.id from sig.style s where s.theme_style_id = (select t.id from sig.theme t inner join sig.map m  on m.id = t.theme_map where t.is_default = true and  m.id = '"+mapId+"' \n" +
+				"(select s.id from sig.style s where s.theme_style_id = (select t.id from sig.theme t inner join sig.map m  on m.id = t.theme_map where t.is_default = true and  m.id = ? \n"
+				+
 				")),\n" +
-				" layer_map_style as (select s.layer_map_style from styles_in_theme st inner join sig.style s on s.id = st.id)\n" +
+				" layer_map_style as (select s.layer_map_style from styles_in_theme st inner join sig.style s on s.id = st.id)\n"
+				+
 				"select ml.map_layer_id, ml.layers_id, ml.layer_order, ml.is_visible from sig.map_layers ml where ml.map_layer_id in (select * from layer_map_style)";
 	}
 
 	@Override
-	public Boolean checkIfThemeContainLayer(UUID themeId, UUID layerId){
-		String query =  "with styles_in_theme as \n" +
-				"(select s.id from sig.style s where s.theme_style_id = '" + themeId +"'),"+
-				" layer_map_style as (select s.layer_map_style from styles_in_theme st inner join sig.style s on s.id = st.id)\n" +
-				" select 1 from sig.map_layers ml where ml.map_layer_id in (select * from layer_map_style) and ml.layers_id = '" + layerId +"'";
-		try{
-			jdbcTemplate.queryForObject(query , String.class );
+	public Boolean checkIfThemeContainLayer(UUID themeId, UUID layerId) {
+		String query = "with styles_in_theme as \n" +
+				"(select s.id from sig.style s where s.theme_style_id = '" + themeId + "')," +
+				" layer_map_style as (select s.layer_map_style from styles_in_theme st inner join sig.style s on s.id = st.id)\n"
+				+
+				" select 1 from sig.map_layers ml where ml.map_layer_id in (select * from layer_map_style) and ml.layers_id = '"
+				+ layerId + "'";
+		try {
+			jdbcTemplate.queryForObject(query, String.class);
 			return false;
-		}catch (Exception e){
+		} catch (Exception e) {
 			return true;
 		}
 	}
-
 
 	public MapSimpleDto saveMap(MapDto mapDto, NotificationSimpleDto notification) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -835,21 +864,21 @@ public class MapServiceImpl extends CommonServiceImpl<dz.eadn.sig.model.Map, Map
 			map = mapMapper.dtoToEntity(mapDto);
 
 			if (mapDto.getId() == null) {
-				//Init the default theme
+				// Init the default theme
 				Theme defaultTheme = new Theme();
 				defaultTheme.setIsDefault(true);
 				defaultTheme.setMap(map);
 				map.getThemes().add(defaultTheme);
 				User owner = userService.findByUsername(authentication.getName());
 
-				if (owner != null && mapDto.getUserDtos() != null && mapDto.getUserDtos().stream().noneMatch(u -> u.getEmail().equals(owner.getEmail())))
+				if (owner != null && mapDto.getUserDtos() != null
+						&& mapDto.getUserDtos().stream().noneMatch(u -> u.getEmail().equals(owner.getEmail())))
 					map.getUsers().add(owner);
 			}
 
 			map.setSlug(Utils.toSlug(map.getName()));
 
 			map = mapRepository.save(map);
-
 
 			mapSimpleDto = modelMapper.map(map, MapSimpleDto.class);
 
@@ -916,14 +945,14 @@ public class MapServiceImpl extends CommonServiceImpl<dz.eadn.sig.model.Map, Map
 		clonedMap.setId(null);
 		clonedMap.setName(cloneMapDto.getOutputName());
 		clonedMap.setPrivacy(cloneMapDto.getPrivacy());
-		if(cloneMapDto.getCloneUsers()){
-			List<UserDto> userDtoList =  cModelMapper.mapList(map.getUsers(), UserDto.class);
+		if (cloneMapDto.getCloneUsers()) {
+			List<UserDto> userDtoList = cModelMapper.mapList(map.getUsers(), UserDto.class);
 			userDtoList.forEach(u -> u.setPassword(null));
 			clonedMap.setUserDtos(userDtoList);
-		}else{
+		} else {
 			clonedMap.setUserDtos(null);
 		}
-		if(!cloneMapDto.getCloneGroups()){
+		if (!cloneMapDto.getCloneGroups()) {
 			clonedMap.setGroupDtos(null);
 		}
 		MapSimpleDto savedMap = createMap(clonedMap);

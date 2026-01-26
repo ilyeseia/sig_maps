@@ -1,18 +1,16 @@
 package dz.eadn.sig.dto;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import dz.eadn.sig.model.SymbologyType;
 import dz.eadn.sig.model.Theme;
 import dz.eadn.sig.util.WITHUUID;
-import jdk.nashorn.internal.ir.annotations.Ignore;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.util.UUID;
-
 
 /**
  * @author Chouaib LOKBANI
