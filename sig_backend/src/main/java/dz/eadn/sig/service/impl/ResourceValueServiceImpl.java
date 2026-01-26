@@ -66,22 +66,33 @@ public class ResourceValueServiceImpl extends CommonServiceImpl<ResourceValue, R
 	@Transactional
 	@Override
 	public ResourceValueDto save(ResourceValueDto resourceValueDto) throws GlobalException {
-		try{
-			ResourceValue resourceValue = resourceValueRepository.save(resourceValueMapper.dtoToEntity(resourceValueDto));
+		try {
+			ResourceValue resourceValue = resourceValueRepository
+					.save(resourceValueMapper.dtoToEntity(resourceValueDto));
 			if (resourceValueDto != null && resourceValueDto.getId() != null) {
-				List<Map<String, Object>> affectedFields = jdbcTemplate.queryForList("select  f.slug,  f.layer_id from sig.field f where f.resource_id = '" + resourceValueDto.getResourceId() +"'\n");
-				affectedFields.forEach(f -> {
-					jdbcTemplate.execute(
-							"update sig.entity_element e  SET properties =  JSONB_SET(e.properties, '{"+ f.get("slug") +"}', '\"" + resourceValueDto.getId() + ":" + resourceValueDto.getValue().replace("'", "''")+ "\"')\n" +
-									"from sig.field f\n" +
-									"where e.layer_entity_element = '" + f.get("layer_id") +"'  and\n" +
-									"      split_part(e.properties->>f.slug, ':', 1) =  '" + resourceValueDto.getId() + "'"
-					);
-				});
+				if (resourceValueDto != null && resourceValueDto.getId() != null) {
+					String selectSql = "select f.slug, f.layer_id from sig.field f where f.resource_id = ?";
+					List<Map<String, Object>> affectedFields = jdbcTemplate.queryForList(selectSql,
+							resourceValueDto.getResourceId());
+
+					affectedFields.forEach(f -> {
+						String slug = (String) f.get("slug");
+						UUID layerId = (UUID) f.get("layer_id");
+						String val = resourceValueDto.getId() + ":" + resourceValueDto.getValue();
+						String path = "{\"" + slug + "\"}";
+
+						String updateSql = "update sig.entity_element e SET properties = JSONB_SET(e.properties, ?::text[], to_jsonb(?::text)) "
+								+
+								"where e.layer_entity_element = ? and " +
+								"split_part(e.properties->> ?, ':', 1) = ?";
+
+						jdbcTemplate.update(updateSql, path, val, layerId, slug, resourceValueDto.getId().toString());
+					});
+				}
 			}
 
 			return resourceValueMapper.entityToDto(resourceValue);
-		}catch (Exception e){
+		} catch (Exception e) {
 			throw new GlobalException("une erreur inattendue s'est produite ?");
 		}
 	}
@@ -114,14 +125,13 @@ public class ResourceValueServiceImpl extends CommonServiceImpl<ResourceValue, R
 		return resourceValues;
 	}
 
-
 	@Transactional
 	@Override
 	public void delete(UUID id) {
 
 		ResourceValue resourceValue = findById(id);
 
-		if(resourceValueRepository.countAllByParentId(id) > 0){
+		if (resourceValueRepository.countAllByParentId(id) > 0) {
 			throw new GlobalException("Cette valeur a déjà des enfants, supprimez-les d'abord");
 		}
 
@@ -133,14 +143,14 @@ public class ResourceValueServiceImpl extends CommonServiceImpl<ResourceValue, R
 		resourceValueRepository.deleteAllByParentId(id);
 	}
 
-
 	@Override
 	public void deleteAll(Collection<ResourceValue> instances) {
 		resourceValueRepository.deleteAll(instances);
 	}
 
 	@Override
-	public PageDto<ResourceValueDto> findByValueAndResource(String resourceId, String searchedValue, Integer page, Integer limit, String sort, String dir) {
+	public PageDto<ResourceValueDto> findByValueAndResource(String resourceId, String searchedValue, Integer page,
+			Integer limit, String sort, String dir) {
 		PageDto<ResourceValueDto> pageDto = null;
 		pageDto = new PageDto<>();
 		Sort sortDir = null;
@@ -152,8 +162,10 @@ public class ResourceValueServiceImpl extends CommonServiceImpl<ResourceValue, R
 
 		Pageable pageable = PageRequest.of(page, limit, sortDir);
 
-		Page<ResourceValue> resourceValuesPage = resourceValueRepository.findAllByResource_IdAndValueContainsIgnoreCase(UUID.fromString(resourceId),searchedValue, pageable);
-		List<ResourceValueDto> resourceValuesDto = cModelMapper.mapList(resourceValuesPage.getContent(), ResourceValueDto.class);
+		Page<ResourceValue> resourceValuesPage = resourceValueRepository
+				.findAllByResource_IdAndValueContainsIgnoreCase(UUID.fromString(resourceId), searchedValue, pageable);
+		List<ResourceValueDto> resourceValuesDto = cModelMapper.mapList(resourceValuesPage.getContent(),
+				ResourceValueDto.class);
 		pageDto.setContent(resourceValuesDto);
 		pageDto.setTotalElements(resourceValuesPage.getTotalElements());
 
@@ -161,7 +173,8 @@ public class ResourceValueServiceImpl extends CommonServiceImpl<ResourceValue, R
 	}
 
 	@Override
-	public PageDto<ResourceValueDto> findByValueAndResourceAndParent(String resourceId, String rvParentId, String searchedValue, Integer page, Integer limit, String sort, String dir) {
+	public PageDto<ResourceValueDto> findByValueAndResourceAndParent(String resourceId, String rvParentId,
+			String searchedValue, Integer page, Integer limit, String sort, String dir) {
 		PageDto<ResourceValueDto> pageDto = null;
 		pageDto = new PageDto<>();
 		Sort sortDir = null;
@@ -173,8 +186,11 @@ public class ResourceValueServiceImpl extends CommonServiceImpl<ResourceValue, R
 
 		Pageable pageable = PageRequest.of(page, limit, sortDir);
 
-		Page<ResourceValue> resourceValuesPage = resourceValueRepository.findAllByResource_IdAndParentIdAndValueContainsIgnoreCase(UUID.fromString(resourceId),UUID.fromString(rvParentId), searchedValue, pageable);
-		List<ResourceValueDto> resourceValuesDto = cModelMapper.mapList(resourceValuesPage.getContent(), ResourceValueDto.class);
+		Page<ResourceValue> resourceValuesPage = resourceValueRepository
+				.findAllByResource_IdAndParentIdAndValueContainsIgnoreCase(UUID.fromString(resourceId),
+						UUID.fromString(rvParentId), searchedValue, pageable);
+		List<ResourceValueDto> resourceValuesDto = cModelMapper.mapList(resourceValuesPage.getContent(),
+				ResourceValueDto.class);
 		pageDto.setContent(resourceValuesDto);
 		pageDto.setTotalElements(resourceValuesPage.getTotalElements());
 
@@ -193,18 +209,19 @@ public class ResourceValueServiceImpl extends CommonServiceImpl<ResourceValue, R
 
 	@Override
 	public boolean checkExistenceByResource(UUID resourceId, UUID parentId, String value) {
-		return parentId == null ?
-				resourceValueRepository.countByResource_IdAndValueIgnoreCase(resourceId, value) > 0 :
-				resourceValueRepository.countByResource_IdAndParentIdAndValueIgnoreCase(resourceId, parentId, value) > 0;
+		return parentId == null ? resourceValueRepository.countByResource_IdAndValueIgnoreCase(resourceId, value) > 0
+				: resourceValueRepository.countByResource_IdAndParentIdAndValueIgnoreCase(resourceId, parentId,
+						value) > 0;
 	}
 
 	@Override
-	public HashMap<String, List<ResourceValueDto>>  importResourceValues(List<ResourceValueDto> resourceValueDtoList, boolean withMissingValue) {
-		if(resourceValueDtoList != null && !resourceValueDtoList.isEmpty()) {
+	public HashMap<String, List<ResourceValueDto>> importResourceValues(List<ResourceValueDto> resourceValueDtoList,
+			boolean withMissingValue) {
+		if (resourceValueDtoList != null && !resourceValueDtoList.isEmpty()) {
 			HashMap<String, List<ResourceValueDto>> addedDeletedRV = new HashMap<>();
 			addedDeletedRV.put("addedValues", new ArrayList<>());
 			addedDeletedRV.put("skippedValues", new ArrayList<>());
-			if(withMissingValue){
+			if (withMissingValue) {
 				resourceValueDtoList.forEach(rv -> {
 					if (!checkExistenceByResource(rv.getResourceId(), rv.getParentId(), rv.getValue())) {
 						ResourceValue addedRV = resourceValueRepository.save(resourceValueMapper.dtoToEntity(rv));
@@ -212,7 +229,8 @@ public class ResourceValueServiceImpl extends CommonServiceImpl<ResourceValue, R
 					}
 				});
 			}
-			addedDeletedRV.get("skippedValues").addAll(mapper.entitysToDtos(resourceValueRepository.findAllByResource_Id(resourceValueDtoList.get(0).getResourceId())));
+			addedDeletedRV.get("skippedValues").addAll(mapper.entitysToDtos(
+					resourceValueRepository.findAllByResource_Id(resourceValueDtoList.get(0).getResourceId())));
 			return addedDeletedRV;
 		}
 		return null;
@@ -223,7 +241,7 @@ public class ResourceValueServiceImpl extends CommonServiceImpl<ResourceValue, R
 	public List<UUID> deleteAllResourceValuesByResource(UUID uuid) {
 		List<UUID> deletedRV = new ArrayList<>();
 		resourceValueRepository.findAllByResource_Id(uuid).forEach(r -> {
-			if(resourceValueRepository.countAllByParentId(r.getId()) == 0){
+			if (resourceValueRepository.countAllByParentId(r.getId()) == 0) {
 				deletedRV.add(r.getId());
 				resourceValueRepository.delete(r);
 			}
@@ -237,7 +255,7 @@ public class ResourceValueServiceImpl extends CommonServiceImpl<ResourceValue, R
 		List<UUID> deletedRV = new ArrayList<>();
 		AtomicBoolean allDeleted = new AtomicBoolean(true);
 		resourceValueRepository.findAllByParentId(uuid).forEach(r -> {
-			if(resourceValueRepository.countAllByParentId(r.getId()) == 0){
+			if (resourceValueRepository.countAllByParentId(r.getId()) == 0) {
 				deletedRV.add(r.getId());
 				resourceValueRepository.delete(r);
 			}
