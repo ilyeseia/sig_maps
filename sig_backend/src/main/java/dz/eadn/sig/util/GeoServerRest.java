@@ -93,7 +93,6 @@ public class GeoServerRest {
 
 
 	@PostConstruct
-	@PostConstruct
 	public void init() {
 		requestFactory = new NetHttpTransport().createRequestFactory();
 	}
