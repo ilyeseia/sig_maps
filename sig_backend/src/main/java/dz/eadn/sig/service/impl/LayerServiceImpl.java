@@ -1017,8 +1017,8 @@ public class LayerServiceImpl extends CommonServiceImpl<Layer, LayerDto> impleme
 		List<UUID> layerIds = null;
 
 		if (map != null) {
-			String query = mapService.buildLayersMapQuery(map.getId());
-			List<Map<String, Object>> mapLayers = jdbcTemplate.queryForList(query);
+			String query = mapService.buildLayersMapQuery();
+			List<Map<String, Object>> mapLayers = jdbcTemplate.queryForList(query, map.getId());
 			layerIds = mapLayers.stream().map(ml -> UUID.fromString(String.valueOf(ml.get("layers_id"))))
 					.collect(Collectors.toList());
 			if (layerIds.size() > 0)

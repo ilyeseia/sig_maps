@@ -1,6 +1,5 @@
 package dz.eadn.sig.service.impl;
 
-
 import dz.eadn.sig.dto.*;
 import dz.eadn.sig.exceptions.GlobalException;
 import dz.eadn.sig.mapper.CommonModelMapper;
@@ -26,7 +25,6 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
 
 @Service
 public class ThemeServiceImpl extends CommonServiceImpl<Theme, ThemeDto> implements ThemeService {
@@ -79,7 +77,7 @@ public class ThemeServiceImpl extends CommonServiceImpl<Theme, ThemeDto> impleme
     }
 
     public NotificationSimpleDto createNotification(NotificationLevel level, Operation operation, String message,
-                                                    SystemNotification systemNotification, List<User> users) {
+            SystemNotification systemNotification, List<User> users) {
 
         NotificationSimpleDto notification = new NotificationSimpleDto();
 
@@ -95,14 +93,14 @@ public class ThemeServiceImpl extends CommonServiceImpl<Theme, ThemeDto> impleme
     }
 
     @Override
-    public ThemeDto save(ThemeDto themeDto){
-        if(themeDto != null){
-            if(themeDto.getId() != null){
-                ThemeDto t =  updateTheme(themeDto);
+    public ThemeDto save(ThemeDto themeDto) {
+        if (themeDto != null) {
+            if (themeDto.getId() != null) {
+                ThemeDto t = updateTheme(themeDto);
                 t.setMap(null);
                 return t;
-            }else{
-                ThemeDto t =  createTheme(themeDto);
+            } else {
+                ThemeDto t = createTheme(themeDto);
                 t.setMap(null);
                 return t;
             }
@@ -110,19 +108,19 @@ public class ThemeServiceImpl extends CommonServiceImpl<Theme, ThemeDto> impleme
         return null;
     }
 
-
     @Transactional
     @Override
     public ThemeDto createTheme(ThemeDto themeDto) {
-        if(themeRepository.countByMap_IdAndName(themeDto.getMap().getId(), themeDto.getName()) == 0) {
+        if (themeRepository.countByMap_IdAndName(themeDto.getMap().getId(), themeDto.getName()) == 0) {
             Map map = mapService.findById(themeDto.getMap().getId());
             if (map != null) {
                 Theme theme = themeMapper.dtoToEntity(themeDto);
                 theme = themeRepository.save(theme);
                 if (!themeDto.getSnapshotType().equals("empty")) {
                     try {
-                        String query = mapService.buildLayersMapQuery(themeDto.getMap().getId());
-                        List<java.util.Map<String, Object>> layersMaps = jdbcTemplate.queryForList(query);
+                        String query = mapService.buildLayersMapQuery();
+                        List<java.util.Map<String, Object>> layersMaps = jdbcTemplate.queryForList(query,
+                                themeDto.getMap().getId());
                         List<MapLayerDto> mapLayerDtos = new ArrayList<>();
                         Theme finalTheme = theme;
                         layersMaps.forEach(lm -> {
@@ -132,7 +130,7 @@ public class ThemeServiceImpl extends CommonServiceImpl<Theme, ThemeDto> impleme
 
                             String q = "select l.topo from sig.layer l where l.id  =?";
                             layerSimpleDto.setTopo((String) jdbcTemplate.queryForObject(
-                                    q, new Object[]{UUID.fromString(lm.get("layers_id").toString())}, String.class));
+                                    q, new Object[] { UUID.fromString(lm.get("layers_id").toString()) }, String.class));
                             mapLayerDto.setLayer(layerSimpleDto);
                             mapLayerDto.setMap(modelMapper.map(map, MapSimpleDto.class));
                             if (themeDto.getSnapshotType().equals("layersAndStyles")) {
@@ -143,7 +141,7 @@ public class ThemeServiceImpl extends CommonServiceImpl<Theme, ThemeDto> impleme
                             mapLayerDto.setOrder(Integer.parseInt(lm.get("layer_order").toString()));
                             mapLayerDto.setIsVisible(Boolean.parseBoolean(lm.get("is_visible").toString()));
                             mapLayerDto.setTheme(finalTheme);
-                            if (themeDto.getSnapshotType().equals("layers")){
+                            if (themeDto.getSnapshotType().equals("layers")) {
                                 mapLayerDto.setTargetTheme(themeMapper.entityToDto(finalTheme));
                             }
                             mapLayerDtos.add(mapLayerDto);
@@ -161,23 +159,23 @@ public class ThemeServiceImpl extends CommonServiceImpl<Theme, ThemeDto> impleme
 
                 List<User> users = new ArrayList<>();
 
-
                 users.addAll(map.getUsers());
 
                 for (Group group : map.getGroups()) {
                     users.addAll(group.getUsers());
                 }
 
-                ThemeDto savedThemeDto =  modelMapper.map(theme, ThemeDto.class);
+                ThemeDto savedThemeDto = modelMapper.map(theme, ThemeDto.class);
 
                 Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-                String message = String.format(messages.getMessages().get("THEME_CREATE"), themeDto.getName(), authentication.getName(), map.getName()
-                );
+                String message = String.format(messages.getMessages().get("THEME_CREATE"), themeDto.getName(),
+                        authentication.getName(), map.getName());
 
                 SystemNotification systemNotification = createSystemNotification(Transaction.ADD, savedThemeDto);
 
-                NotificationSimpleDto notification = createNotification(NotificationLevel.INFO, Operation.CREATION, message,
+                NotificationSimpleDto notification = createNotification(NotificationLevel.INFO, Operation.CREATION,
+                        message,
                         systemNotification, users);
 
                 notificationMessageService.sendNotificationMessage(notification);
@@ -186,7 +184,7 @@ public class ThemeServiceImpl extends CommonServiceImpl<Theme, ThemeDto> impleme
             } else {
                 throw new GlobalException("Ce thème existe déjà");
             }
-        }else{
+        } else {
             throw new GlobalException("l'opération d'ajout de theme a échoué ");
         }
     }
@@ -194,10 +192,10 @@ public class ThemeServiceImpl extends CommonServiceImpl<Theme, ThemeDto> impleme
     @Override
     public ThemeDto updateTheme(ThemeDto themeDto) {
         Theme theme = findById(themeDto.getId());
-        if(theme != null){
+        if (theme != null) {
             theme.setName(themeDto.getName());
             theme.setIsDefault(themeDto.getIsDefault());
-            if(themeDto.getIsDefault()){
+            if (themeDto.getIsDefault()) {
                 setDefaultMapTheme(theme.getId(), themeDto.getMap().getId());
             }
             List<User> users = new ArrayList<>();
@@ -207,21 +205,22 @@ public class ThemeServiceImpl extends CommonServiceImpl<Theme, ThemeDto> impleme
                 users.addAll(group.getUsers());
             }
 
-            ThemeDto savedThemeDto =  modelMapper.map(theme, ThemeDto.class);
+            ThemeDto savedThemeDto = modelMapper.map(theme, ThemeDto.class);
 
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-            String message = String.format(messages.getMessages().get("THEME_UPDATE"), themeDto.getName(), theme.getMap().getName(),  authentication.getName()
-            );
+            String message = String.format(messages.getMessages().get("THEME_UPDATE"), themeDto.getName(),
+                    theme.getMap().getName(), authentication.getName());
 
             SystemNotification systemNotification = createSystemNotification(Transaction.UPDATE, savedThemeDto);
 
-            NotificationSimpleDto notification = createNotification(NotificationLevel.INFO, Operation.MODIFICATION, message,
+            NotificationSimpleDto notification = createNotification(NotificationLevel.INFO, Operation.MODIFICATION,
+                    message,
                     systemNotification, users);
 
             notificationMessageService.sendNotificationMessage(notification);
             return savedThemeDto;
-        }else{
+        } else {
             throw new GlobalException("Ce thème n'existe déjà");
         }
     }
@@ -248,12 +247,13 @@ public class ThemeServiceImpl extends CommonServiceImpl<Theme, ThemeDto> impleme
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        String message = String.format(messages.getMessages().get("THEME_DELETE"), themeName, mapName,  authentication.getName()
-        );
+        String message = String.format(messages.getMessages().get("THEME_DELETE"), themeName, mapName,
+                authentication.getName());
 
         SystemNotification systemNotification = createSystemNotification(Transaction.DELETE, themeDto);
 
-        NotificationSimpleDto notification = createNotification(NotificationLevel.SEVERE, Operation.SUPPRISSION, message,
+        NotificationSimpleDto notification = createNotification(NotificationLevel.SEVERE, Operation.SUPPRISSION,
+                message,
                 systemNotification, users);
 
         notificationMessageService.sendNotificationMessage(notification);
@@ -265,8 +265,8 @@ public class ThemeServiceImpl extends CommonServiceImpl<Theme, ThemeDto> impleme
         return themeRepository.findByMap_IdAndIsDefaultTrue(map);
     }
 
-    public void setDefaultMapTheme(UUID themeId, UUID mapId){
-        try{
+    public void setDefaultMapTheme(UUID themeId, UUID mapId) {
+        try {
             String query = "UPDATE sig.theme\n" +
                     "\tSET  is_default=false\n" +
                     "\tWHERE id <> '" + themeId + "' and theme_map = '" + mapId + "'";
@@ -274,8 +274,8 @@ public class ThemeServiceImpl extends CommonServiceImpl<Theme, ThemeDto> impleme
             jdbcTemplate.execute("UPDATE sig.theme\n" +
                     "SET  is_default=true\n" +
                     "WHERE id = '" + themeId + "'");
-        }catch (Exception e){
-            throw  new RuntimeException("Une erreur inattendue s'est produite !");
+        } catch (Exception e) {
+            throw new RuntimeException("Une erreur inattendue s'est produite !");
         }
     }
 
