@@ -15,6 +15,8 @@ configurations {
     }
 }
 repositories {
+    mavenLocal()
+    mavenCentral()
     maven { url "https://repo.osgeo.org/repository/release/" }
     jcenter()
     google()

@@ -44,10 +44,13 @@ import dz.eadn.sig.exceptions.GlobalException;
 import dz.eadn.sig.service.common.impl.CommonServiceImpl;
 import feign.FeignException;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * @author Achrouf Abdenour & A.LAMOUR & C.LOKBANI
  */
 @Service
+@Slf4j
 public class LayerServiceImpl extends CommonServiceImpl<Layer, LayerDto> implements LayerService {
 
 	@PersistenceContext

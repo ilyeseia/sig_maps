@@ -7,7 +7,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -18,6 +17,7 @@ import org.modelmapper.ModelMapper;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import javax.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
 
 import com.google.api.client.http.ByteArrayContent;
@@ -39,7 +39,6 @@ import dz.eadn.sig.security.JwtUtils;
 import dz.eadn.sig.service.LayerService;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
-
 
 @Slf4j
 @Component
@@ -77,7 +76,6 @@ public class GeoServerRest {
 
 	private HttpRequestFactory requestFactory;
 
-
 	@Autowired
 	private LayerService layerService;
 
@@ -87,10 +85,7 @@ public class GeoServerRest {
 	@Autowired
 	private CommonModelMapper<?, ?> cModelMapper;
 
-
-
 	private static final Logger logger = LoggerFactory.getLogger(GeoServerRest.class);
-
 
 	@PostConstruct
 	public void init() {
@@ -107,13 +102,12 @@ public class GeoServerRest {
 		return new String(Base64.encodeBase64(plainCreds.getBytes()));
 	}
 
-
 	private String getFullURL(HttpServletRequest request, String targetRequest) throws UnsupportedEncodingException {
 		StringBuilder requestURL = new StringBuilder();
 		requestURL.append(targetRequest);
 
 		String queryString = request.getQueryString();
-		if(request.getAttribute("exclude") != null){
+		if (request.getAttribute("exclude") != null) {
 			queryString = queryString.replace(request.getAttribute("exclude").toString(), "");
 		}
 		if (queryString == null) {
@@ -239,20 +233,20 @@ public class GeoServerRest {
 		HttpRequest req = null;
 
 		switch (request.getMethod()) {
-		case "get":
-			req = requestFactory.buildGetRequest(url);
-			break;
-		case "delete":
-			req = requestFactory.buildDeleteRequest(url);
-			break;
-		case "put":
-		case "post":
-			req = requestFactory.buildRequest(request.getMethod(), new GenericUrl(request.getUrl()),
-					ByteArrayContent.fromString(request.getContentType(), request.getBody()));
-			req.getHeaders().setContentType(request.getContentType());
-			break;
-		default:
-			throw new Exception("Unsuppored method");
+			case "get":
+				req = requestFactory.buildGetRequest(url);
+				break;
+			case "delete":
+				req = requestFactory.buildDeleteRequest(url);
+				break;
+			case "put":
+			case "post":
+				req = requestFactory.buildRequest(request.getMethod(), new GenericUrl(request.getUrl()),
+						ByteArrayContent.fromString(request.getContentType(), request.getBody()));
+				req.getHeaders().setContentType(request.getContentType());
+				break;
+			default:
+				throw new Exception("Unsuppored method");
 		}
 
 		req.getHeaders().setAccept(request.getAccept());
@@ -292,38 +286,41 @@ public class GeoServerRest {
 	public void wms(HttpServletRequest request, HttpServletResponse response, boolean status, boolean isGuest)
 			throws UnsupportedEncodingException, IOException {
 		try {
-			String layers  = request.getParameter("LAYERS");
-			String map  = request.getParameter("MAP");
-			if(layers != null){
+			String layers = request.getParameter("LAYERS");
+			String map = request.getParameter("MAP");
+			if (layers != null) {
 				String[] splitedLayer = layers.split(",");
-				if(splitedLayer.length > 0){
+				if (splitedLayer.length > 0) {
 					String layerSlug;
 					String excludedLayer;
 					for (int i = 0; i < splitedLayer.length; i++) {
 						layerSlug = splitedLayer[i].split(":")[1];
 						if (layerSlug != null) {
-							try{
-								layerService.CheckIfUserHasPrivilegeOnLayer(layerSlug, map, "ENTITY_ELEMENT_READ_AUTHORITY","read");
-							}catch (AccessNotPermittedException e){
-								if(request.getAttribute("exclude") != null){
-									excludedLayer = i == 1 ?   "%2C" : "";
-									excludedLayer +=  splitedLayer[i].replace(":", "%3A");
-									if(i < splitedLayer.length - 1){
+							try {
+								layerService.CheckIfUserHasPrivilegeOnLayer(layerSlug, map,
+										"ENTITY_ELEMENT_READ_AUTHORITY", "read");
+							} catch (AccessNotPermittedException e) {
+								if (request.getAttribute("exclude") != null) {
+									excludedLayer = i == 1 ? "%2C" : "";
+									excludedLayer += splitedLayer[i].replace(":", "%3A");
+									if (i < splitedLayer.length - 1) {
 										excludedLayer += "%2C";
 									}
-									request.setAttribute("exclude", request.getAttribute("exclude")  + excludedLayer);
-									if(i == splitedLayer.length - 1){
-										throw new AccessNotPermittedException("Vous ne disposez pas de suffisamment de privilèges pour effectuer cette action !");
+									request.setAttribute("exclude", request.getAttribute("exclude") + excludedLayer);
+									if (i == splitedLayer.length - 1) {
+										throw new AccessNotPermittedException(
+												"Vous ne disposez pas de suffisamment de privilèges pour effectuer cette action !");
 									}
 
-								}else{
+								} else {
 									request.setAttribute("exclude", splitedLayer[i].replace(":", "%3A"));
 								}
 							}
 						}
 					}
-				}else if (layers.split(":")[1] != null){
-					layerService.CheckIfUserHasPrivilegeOnLayer(layers.split(":")[1], map,"ENTITY_ELEMENT_READ_AUTHORITY", "read");
+				} else if (layers.split(":")[1] != null) {
+					layerService.CheckIfUserHasPrivilegeOnLayer(layers.split(":")[1], map,
+							"ENTITY_ELEMENT_READ_AUTHORITY", "read");
 				}
 			}
 			HttpRequest req = requestFactory.buildGetRequest(new GenericUrl(getWmsFullURL(request)));
@@ -359,9 +356,9 @@ public class GeoServerRest {
 			throws UnsupportedEncodingException, IOException {
 		String token = request.getParameter("token");
 		if (token != null && jwtUtils.validateJwtToken(token)) {
-			try{
+			try {
 				wms(request, response, true, false);
-			}catch (Exception e){
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		} else {
@@ -373,9 +370,9 @@ public class GeoServerRest {
 			throws UnsupportedEncodingException, IOException {
 		try {
 			wms(request, response, false, true);
+		} catch (Exception e) {
 			log.error("Error in publicWms", e);
 		}
-
 	}
 
 	public FeatureCollection filterDataFromGeoServer(FeatureCollection fc, boolean authenticated) {
@@ -404,7 +401,7 @@ public class GeoServerRest {
 
 								List<String> fieldsName = fields.stream().filter(field -> field.getVisible())
 										.map(field -> field.getSlug()).collect(Collectors.toList());
-								
+
 								fieldsName.add("id");
 
 								properties = properties.entrySet().stream()
