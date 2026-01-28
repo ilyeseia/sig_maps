@@ -1,11 +1,10 @@
 package dz.eadn.sig.model;
 
-
 import dz.eadn.sig.util.WITHUUID;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.List;
 
 /**
@@ -19,14 +18,14 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-public class Theme  extends WITHUUID {
+public class Theme extends WITHUUID {
 
     String name = "Theme par default";
 
     Boolean isDefault = false;
 
     @Schema(description = "The list of styles related to one theme.")
-    @OneToMany(mappedBy = "theme", fetch = FetchType.LAZY, cascade= CascadeType.ALL)
+    @OneToMany(mappedBy = "theme", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     List<Style> styles;
 
     @ManyToOne(fetch = FetchType.LAZY)

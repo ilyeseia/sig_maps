@@ -4,15 +4,16 @@ import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
 
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
 
 import lombok.*;
 import org.hibernate.annotations.Type;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter @Setter
+@Getter
+@Setter
 @Embeddable
 public class MapLayerId implements Serializable {
 
@@ -44,7 +45,8 @@ public class MapLayerId implements Serializable {
 			return false;
 		MapLayerId other = (MapLayerId) obj;
 		return Objects.equals(getMapId(), other.getMapId())
-				&& Objects.equals(getLayerId(), other.getLayerId()) && Objects.equals(getRandomId(), other.getRandomId());
+				&& Objects.equals(getLayerId(), other.getLayerId())
+				&& Objects.equals(getRandomId(), other.getRandomId());
 	}
 
 }

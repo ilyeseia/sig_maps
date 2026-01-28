@@ -2,16 +2,15 @@ package dz.eadn.sig.model;
 
 import java.util.UUID;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.ForeignKey;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 import lombok.*;
-import org.hibernate.annotations.Type;
 
 import dz.eadn.sig.util.WITHUUID;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -22,8 +21,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
  */
 @Entity
 @Table(schema = "sig", name = "resource_value")
-//, uniqueConstraints = {@UniqueConstraint(columnNames = { "value", "resource_id" }, name = "uk_rv_value_resource") }
-@Getter @Setter
+// , uniqueConstraints = {@UniqueConstraint(columnNames = { "value",
+// "resource_id" }, name = "uk_rv_value_resource") }
+@Getter
+@Setter
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
@@ -37,12 +38,10 @@ public class ResourceValue extends WITHUUID {
 	@JoinColumn(foreignKey = @ForeignKey(name = "fk_resource_id"), name = "resource_id")
 	private Resource resource;
 
-	@Type(type = "pg-uuid")
 	@Column(columnDefinition = "uuid", updatable = false)
 	@Schema(description = "The id of resourceValue")
 	private UUID parentId;
 
-	@Type(type = "pg-uuid")
 	@Column(columnDefinition = "uuid", updatable = false)
 	@Schema(description = "The id of resource")
 	private UUID refValue;

@@ -3,7 +3,7 @@ package dz.eadn.sig.model;
 import dz.eadn.sig.util.WITHUUID;
 import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 /**
@@ -15,7 +15,8 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter @Setter
+@Getter
+@Setter
 public class UserLoggedActions extends WITHUUID {
 
     private String ipAddress;

@@ -1,9 +1,8 @@
 package dz.eadn.sig.model;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 import lombok.*;
-import org.hibernate.annotations.Type;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -12,22 +11,20 @@ import java.util.UUID;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter @Setter
+@Getter
+@Setter
 @Entity
-@Table(schema = "sig", name = "map_layers",
-		uniqueConstraints = {
-				@UniqueConstraint(columnNames = "mapLayerId", name = "uk_map_layer") })
+@Table(schema = "sig", name = "map_layers", uniqueConstraints = {
+		@UniqueConstraint(columnNames = "mapLayerId", name = "uk_map_layer") })
 public class MapLayer implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	@Type(type = "pg-uuid")
 	@Column(columnDefinition = "uuid", updatable = false)
 	private UUID mapLayerId;
 
 	@EmbeddedId
 	private MapLayerId id;
-
 
 	@ManyToOne
 	@MapsId("mapId")
@@ -53,7 +50,8 @@ public class MapLayer implements Serializable {
 		this.map = map;
 		this.layer = layer;
 		this.order = order;
-		if(isVisible != null) this.isVisible = isVisible;
+		if (isVisible != null)
+			this.isVisible = isVisible;
 	}
 
 }

@@ -3,16 +3,16 @@ package dz.eadn.sig.model;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.Basic;
-import javax.persistence.Cacheable;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.ForeignKey;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import jakarta.persistence.Basic;
+import jakarta.persistence.Cacheable;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 import lombok.*;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -32,7 +32,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
  */
 @Entity
 @Table(schema = "sig", name = "entity_element")
-@Getter @Setter
+@Getter
+@Setter
 @EqualsAndHashCode(exclude = "layer")
 @AllArgsConstructor
 @NoArgsConstructor
@@ -45,7 +46,7 @@ public class EntityElement extends WITHUUID {
 	@JsonIgnore
 	private Geometry geom;
 
-	@Schema(description ="The properties of the elementEntity.", required = true)
+	@Schema(description = "The properties of the elementEntity.", required = true)
 	@Type(type = "jsonb")
 	@Column(columnDefinition = "jsonb")
 	@Basic(fetch = FetchType.LAZY)

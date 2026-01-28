@@ -1,6 +1,5 @@
 package dz.eadn.sig.model;
 
-
 /**
  * @author LOKBANI Chouaib
  *
@@ -9,8 +8,8 @@ import dz.eadn.sig.util.WITHUUID;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,8 +18,9 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter @Setter
-public class Filter  extends WITHUUID {
+@Getter
+@Setter
+public class Filter extends WITHUUID {
 
     @NotNull
     private String name;

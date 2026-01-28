@@ -3,7 +3,7 @@ package dz.eadn.sig.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 import dz.eadn.sig.util.WITHUUID;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -16,7 +16,8 @@ import lombok.*;
 @Entity
 @Table(schema = "sig", name = "resource", uniqueConstraints = {
 		@UniqueConstraint(columnNames = "name", name = "uk_resource_name") })
-@Getter @Setter
+@Getter
+@Setter
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
@@ -36,8 +37,8 @@ public class Resource extends WITHUUID {
 	@OneToOne(fetch = FetchType.EAGER)
 	private Resource parentResource;
 
-//	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-//	private List<Resource> resourceList;
+	// @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	// private List<Resource> resourceList;
 
 	@Schema(description = "The list values of the resource.")
 	@Column(name = "resource_values")

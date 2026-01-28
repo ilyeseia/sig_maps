@@ -5,9 +5,9 @@ package dz.eadn.sig.model;
 
 import java.util.Date;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 
 import dz.eadn.sig.util.WITHUUID;
 import lombok.*;
@@ -21,7 +21,8 @@ import net.minidev.json.annotate.JsonIgnore;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@Getter @Setter
+@Getter
+@Setter
 @Entity
 @Table(schema = "sig", name = "user_log", uniqueConstraints = {})
 public class UserLog extends WITHUUID {
