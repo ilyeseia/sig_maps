@@ -3,8 +3,8 @@ package dz.eadn.sig.api.v1;
 import java.util.List;
 import java.util.UUID;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 
 import dz.eadn.sig.dto.*;
 import dz.eadn.sig.service.GeoProcessingService;

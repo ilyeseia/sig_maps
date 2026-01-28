@@ -3,8 +3,8 @@ package dz.eadn.sig.dto;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 
 import dz.eadn.sig.model.NotificationLevel;
 import dz.eadn.sig.model.NotificationObject;

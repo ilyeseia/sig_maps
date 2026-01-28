@@ -2,10 +2,10 @@ package dz.eadn.sig.security;
 
 import java.io.IOException;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,8 +18,9 @@ import dz.eadn.sig.service.impl.UserDetailsServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 
 /**
+ * JWT Authentication Filter - Spring Boot 3.x / Jakarta EE
  * @author Ameur LAMOUR
- *
+ * @updated 2026-01-28 - Migration to Jakarta EE
  */
 @Slf4j
 public class AuthTokenFilter extends OncePerRequestFilter {
@@ -45,7 +46,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 				SecurityContextHolder.getContext().setAuthentication(authentication);
 			}
 		} catch (Exception e) {
-			log.error("Cannot set user authentication: {}", e);
+			log.error("Cannot set user authentication: {}", e.getMessage());
 		}
 
 		filterChain.doFilter(request, response);

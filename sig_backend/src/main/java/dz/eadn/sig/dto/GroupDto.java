@@ -3,7 +3,7 @@ package dz.eadn.sig.dto;
 import java.util.List;
 import java.util.UUID;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

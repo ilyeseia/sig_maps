@@ -3,7 +3,7 @@ package dz.eadn.sig.api.v1;
 import java.util.List;
 import java.util.UUID;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 import dz.eadn.sig.model.ResourceValue;
 import dz.eadn.sig.service.ResourceService;

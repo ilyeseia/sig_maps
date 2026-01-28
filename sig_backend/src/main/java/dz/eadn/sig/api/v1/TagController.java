@@ -3,7 +3,7 @@ package dz.eadn.sig.api.v1;
 import java.util.List;
 import java.util.UUID;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

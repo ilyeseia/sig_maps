@@ -1,6 +1,6 @@
 package dz.eadn.sig.dto;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 import dz.eadn.sig.util.WITHUUID;
 import lombok.AllArgsConstructor;

@@ -3,29 +3,35 @@ package dz.eadn.sig.util;
 import java.util.Date;
 import java.util.UUID;
 
-import javax.persistence.Column;
-import javax.persistence.EntityListeners;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 
-import org.hibernate.annotations.Type;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+/**
+ * Base entity class with UUID primary key - Hibernate 6 / Jakarta EE
+ * 
+ * @updated 2026-01-28 - Migration to Jakarta EE, removed deprecated @Type
+ *          annotation
+ */
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
 public class WITHUUID {
 
-	@GeneratedValue
+	@GeneratedValue(strategy = GenerationType.UUID)
 	@Id
-	@Type(type = "pg-uuid")
-	@Column(columnDefinition = "uuid", updatable = false) // hack to geometry probleme :
+	@Column(columnDefinition = "uuid", updatable = false)
 	private UUID id;
 
 	private Boolean deleted = false;
@@ -45,7 +51,6 @@ public class WITHUUID {
 	private Date lastModifiedDate;
 
 	public WITHUUID() {
-		// this.id = UUID.randomUUID();<
 	}
 
 	public UUID getId() {

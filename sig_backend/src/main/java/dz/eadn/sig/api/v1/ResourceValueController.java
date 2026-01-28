@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 import dz.eadn.sig.dto.PageDto;
 import dz.eadn.sig.exceptions.GlobalException;

@@ -1,5 +1,5 @@
 # Build stage
-FROM eclipse-temurin:8-jdk as builder
+FROM eclipse-temurin:17-jdk as builder
 WORKDIR /app
 
 # Install dos2unix for converting line endings
@@ -25,7 +25,7 @@ COPY src src
 RUN ./gradlew build -x test --no-daemon
 
 # Runtime stage
-FROM eclipse-temurin:8-jre
+FROM eclipse-temurin:17-jre
 WORKDIR /app
 
 # Create a non-root user
@@ -53,6 +53,7 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
     CMD curl -f http://localhost:8080/actuator/health || exit 1
 
 # Use environment variable for JVM settings with defaults
-ENV JAVA_OPTS="-Xms2048m -Xmx4096m"
+# Java 17 optimized settings
+ENV JAVA_OPTS="-Xms2048m -Xmx4096m -XX:+UseG1GC -XX:MaxGCPauseMillis=200"
 
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar /app/app.jar"]

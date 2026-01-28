@@ -3,8 +3,8 @@
  */
 package dz.eadn.sig.dto;
 
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 
 import lombok.Data;
 import lombok.Getter;
