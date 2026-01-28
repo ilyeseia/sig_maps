@@ -18,7 +18,7 @@ repositories {
     mavenLocal()
     mavenCentral()
     maven { url "https://repo.osgeo.org/repository/release/" }
-    jcenter()
+    // jcenter() - Removed: deprecated and shutting down
     google()
 }
 
@@ -64,11 +64,11 @@ dependencies {
     implementation group: 'org.hibernate', name: 'hibernate-gradle-plugin', version: '5.4.8.Final'
     implementation group: 'org.hibernate', name: 'hibernate-spatial', version: '5.6.15.Final'
     implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
-    implementation group: 'redis.clients', name: 'jedis', version: '4.3.0-m1'
+    implementation group: 'redis.clients', name: 'jedis', version: '4.4.6'
     compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.24'
     implementation group: 'com.vladmihalcea', name: 'hibernate-types-52', version: '2.18.0'
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.2.2'
-    implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.6.11'
+    implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.7.0'
     implementation group: 'org.apache.commons', name: 'commons-io', version: '2.11.0'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: '2.7.3'
     implementation group: 'org.thymeleaf', name: 'thymeleaf-spring5', version: '3.1.0.M2'
