@@ -86,9 +86,10 @@ dist
 # Service worker
 sw.*
 
-# Conststant 
+# Constants (sensitive)
 .constants.js
+constants.js
+
+# Lock files (regenerated on install)
 package-lock.json
-package.json
-constants.js
-constants.js
+yarn.lock
