@@ -1,50 +1,64 @@
 const pkg = require('./package.json')
-const base = process.env.NODE_ENV === "production" ? "/" : "/"
-
 
 module.exports = {
   ssr: false,
+  target: 'static',
+  
   router: {
-    base
+    base: '/'
   },
+  
   server: {
-    port: process.env.NODE_ENV === 'production' ? 80 : 5000
+    port: process.env.PORT || 3000,
+    host: '0.0.0.0'
   },
 
-  /*
-  ** Headers of the page
-  */
+  // Environment variables
+  env: {
+    API_BASE_URL: process.env.API_BASE_URL || 'http://localhost:8080',
+    NODE_ENV: process.env.NODE_ENV || 'development'
+  },
+
+  // Public runtime config
+  publicRuntimeConfig: {
+    axios: {
+      browserBaseURL: process.env.API_BASE_URL || 'http://localhost:8080'
+    }
+  },
+
+  // Private runtime config
+  privateRuntimeConfig: {
+    axios: {
+      baseURL: process.env.API_BASE_URL || 'http://backend:8080'
+    }
+  },
+
+  // Headers of the page
   head: {
-    title: pkg.name,
+    title: 'SIG Maps - Geographic Information System',
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       { hid: 'description', name: 'description', content: pkg.description },
-      { httpEquiv: 'Content-Security-Policy', content: "default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data:; img-src 'self' https: data: blob:; font-src 'self' https: data:;" }
+      { name: 'format-detection', content: 'telephone=no' }
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/kharitadz-logo-offecial.ico' },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&family=Righteous&display=swap" }
-    ],
-    script: [
+      { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&family=Righteous&display=swap' }
     ]
   },
 
-  /*
-  ** Customize the progress-bar color
-  */
+  // Loading bar
   loading: './components/Loading.vue',
 
-  /*
-  ** Global CSS
-  */
+  // Global CSS
   css: [
     'primevue/resources/primevue.css',
     'primevue/resources/themes/fluent-light/theme.css',
     'primeicons/primeicons.css',
     'ant-design-vue/dist/antd.min.css',
     '@fortawesome/fontawesome-free/css/all.min.css',
-    'node_modules/bootstrap/dist/css/bootstrap.min.css',
+    'bootstrap/dist/css/bootstrap.min.css',
     '@syncfusion/ej2-base/styles/material.css',
     '@syncfusion/ej2-buttons/styles/material.css',
     '@syncfusion/ej2-popups/styles/material.css',
@@ -54,77 +68,61 @@ module.exports = {
     '@syncfusion/ej2-dropdowns/styles/material.css',
     '@syncfusion/ej2-navigations/styles/material.css',
     '@syncfusion/ej2-grids/styles/material.css',
+    '@/assets/sass/main.scss'
   ],
 
   styleResources: {
     scss: ['./assets/sass/main.scss']
   },
 
-  /*
-  ** Global SCSS
-  */
-
-  /*
-  ** Plugins to load before mounting the App
-  */
+  // Plugins
   plugins: [
     { src: '~/plugins/leaflet', ssr: false },
     { src: '~/plugins/antd' },
     { src: '~/plugins/persistedState.client.js' },
-    { src: '~/plugins/vue-moment.js' },
+    { src: '~/plugins/vue-moment.js' }
   ],
-  // Auto import Components 
-  //components: true,
-  /*
-  ** Nuxt.js modules
-  */
+
+  // Nuxt.js modules
   modules: [
-    // Doc: https://axios.nuxtjs.org/usage
     '@nuxtjs/axios',
-    // Doc: https://buefy.github.io/#/documentation
     'nuxt-buefy',
     '@nuxtjs/dotenv',
     'vue-social-sharing/nuxt',
-    '@nuxtjs/style-resources'
+    '@nuxtjs/style-resources',
+    '@nuxtjs/moment'
   ],
-  /*
-  ** Axios module configuration
-  */
+
+  // Axios configuration
   axios: {
-    // See https://github.com/nuxt-community/axios-module#options
+    baseURL: process.env.API_BASE_URL || 'http://localhost:8080',
+    timeout: 30000,
+    headers: {
+      'Content-Type': 'application/json'
+    }
   },
-  /*   publicRuntimeConfig: {
-      
-    },
-    privateRuntimeConfig: {
-     
-    },  */
-  /*
-  ** Build configuration
-  */
-  target: 'static',
+
+  // Build configuration
   build: {
     loaders: {
       scss: {
         implementation: require('sass'),
         sassOptions: {
           quietDeps: true,
-          silenceDeprecations: ['legacy-js-api', 'import'],
+          silenceDeprecations: ['legacy-js-api', 'import']
         }
       }
     },
-    /*
-    ** You can extend webpack config here
-    */
-    modules: [
-      '@nuxtjs/moment'
-    ],
-    plugins: [
-
-    ],
     extend(config, ctx) {
-
+      // Add custom webpack config if needed
     }
+  },
+
+  // Generate configuration
+  generate: {
+    fallback: true,
+    exclude: [
+      /^\/api/
+    ]
   }
 }
-

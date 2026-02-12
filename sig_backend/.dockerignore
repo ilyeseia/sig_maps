@@ -1,22 +1,36 @@
-# Ignorer les fichiers et répertoires inutiles
-.git
+# Build outputs
+build/
+!build/libs/*.jar
+.gradle/
+out/
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+
+# Git
+.git/
 .gitignore
+
+# Documentation
 *.md
-README*
-.gradle
-build
-target
+LICENSE
+
+# Test files
+testsprite_tests/
+src/test/
+
+# Temporary files
 *.log
 *.tmp
+*.swp
+*~
+
+# OS files
 .DS_Store
 Thumbs.db
-.idea
-.vscode
-*.iml
-*.iws
-*.ipr
-.settings
-.project
-.classpath
-bin
-out
+
+# Scripts
+*.ps1
+*.sh

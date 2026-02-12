@@ -1,79 +1,77 @@
 #!/bin/bash
-# Script bash pour déploiement Docker sur Linux/Mac
-# Alternative au script PowerShell
+
+# ============================================
+# SIG Maps - Docker Deployment Script
+# ============================================
 
 set -e
 
-echo "========================================"
-echo "  Déploiement Docker - Projet SIG"
-echo "========================================"
-echo ""
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
 
-# Vérifier Docker
-echo "[1/5] Vérification de Docker..."
+echo -e "${GREEN}========================================${NC}"
+echo -e "${GREEN}SIG Maps - Docker Deployment${NC}"
+echo -e "${GREEN}========================================${NC}"
+
+# Check if .env exists
+if [ ! -f .env ]; then
+    echo -e "${YELLOW}Warning: .env file not found!${NC}"
+    echo -e "${YELLOW}Creating .env from .env.example...${NC}"
+    
+    if [ -f .env.example ]; then
+        cp .env.example .env
+        echo -e "${RED}Please edit .env file with your configuration${NC}"
+        exit 1
+    else
+        echo -e "${RED}Error: .env.example not found!${NC}"
+        exit 1
+    fi
+fi
+
+# Check if Docker is installed
 if ! command -v docker &> /dev/null; then
-    echo "✗ Docker n'est pas installé!"
+    echo -e "${RED}Error: Docker is not installed!${NC}"
     exit 1
 fi
-echo "✓ Docker installé: $(docker --version)"
 
-# Vérifier Docker Engine
-echo "[2/5] Vérification de Docker Engine..."
-if ! docker ps &> /dev/null; then
-    echo "✗ Docker Engine n'est pas démarré!"
-    echo "Démarrez Docker et relancez ce script."
+# Check if Docker Compose is installed
+if ! command -v docker-compose &> /dev/null; then
+    echo -e "${RED}Error: Docker Compose is not installed!${NC}"
     exit 1
 fi
-echo "✓ Docker Engine est démarré"
 
-# Vérifier .env
-echo "[3/5] Vérification de la configuration..."
-if [ ! -f ".env" ]; then
-    echo "⚠ Fichier .env introuvable, copie depuis .env.example..."
-    cp .env.example .env
-    echo "✓ Fichier .env créé"
-else
-    echo "✓ Fichier .env existe"
-fi
+echo -e "${GREEN}Step 1: Checking environment...${NC}"
 
-# Construire les images
-echo "[4/5] Construction des images Docker..."
-echo "   Ceci peut prendre 10-15 minutes..."
-docker compose build --no-cache frontend
-docker compose build
-
-if [ $? -ne 0 ]; then
-    echo "✗ Erreur lors de la construction"
+# Check required variables
+if ! grep -q "POSTGRES_PASSWORD=." .env; then
+    echo -e "${RED}Error: POSTGRES_PASSWORD is not set in .env${NC}"
     exit 1
 fi
-echo "✓ Images construites avec succès"
 
-# Démarrer les services
-echo "[5/5] Démarrage des services..."
-docker compose up -d
+echo -e "${GREEN}Step 2: Building Docker images...${NC}"
+docker-compose build --no-cache
 
-if [ $? -ne 0 ]; then
-    echo "✗ Erreur lors du démarrage"
-    exit 1
-fi
-echo "✓ Services démarrés"
+echo -e "${GREEN}Step 3: Starting services...${NC}"
+docker-compose up -d
+
+echo -e "${GREEN}Step 4: Waiting for services to be healthy...${NC}"
+sleep 10
+
+# Check service status
+echo -e "${GREEN}Step 5: Checking service status...${NC}"
+docker-compose ps
 
 echo ""
-echo "========================================"
-echo "  Déploiement terminé avec succès!"
-echo "========================================"
+echo -e "${GREEN}========================================${NC}"
+echo -e "${GREEN}Deployment Complete!${NC}"
+echo -e "${GREEN}========================================${NC}"
 echo ""
-echo "Services disponibles:"
-echo "  • Frontend:     http://localhost:80"
-echo "  • Backend API:  http://localhost:8080"
-echo "  • Health Check: http://localhost:8080/actuator/health"
+echo -e "Access the application at:"
+echo -e "  Frontend: ${GREEN}http://localhost${NC}"
+echo -e "  Backend:  ${GREEN}http://localhost:8080${NC}"
 echo ""
-echo "Commandes utiles:"
-echo "  • Voir les logs:        docker-compose logs -f"
-echo "  • Arrêter les services: docker-compose down"
-echo "  • Statut des services:  docker-compose ps"
-echo ""
-
-# Attendre et vérifier
-sleep 5
-docker compose ps
+echo -e "To view logs: ${YELLOW}docker-compose logs -f${NC}"
+echo -e "To stop:      ${YELLOW}docker-compose down${NC}"

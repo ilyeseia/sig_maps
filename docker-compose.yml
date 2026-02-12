@@ -1,23 +1,26 @@
+version: '3.8'
+
 services:
-  # PostgreSQL Database
+  # PostgreSQL Database with PostGIS
   postgres:
-    image: postgis/postgis:13-3.1
+    image: postgis/postgis:15-3.3
     container_name: sig_postgres
     restart: unless-stopped
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-sig_db}
       POSTGRES_USER: ${POSTGRES_USER:-sig_user}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
       PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - sig-network
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-sig_user} -d ${POSTGRES_DB:-sig_db}" ]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-sig_user} -d ${POSTGRES_DB:-sig_db}"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
+      start_period: 30s
 
   # Spring Boot Backend
   backend:
@@ -30,12 +33,12 @@ services:
       SPRING_PROFILES_ACTIVE: docker
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-sig_db}
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-sig_user}
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
-      JAVA_OPTS: ${JAVA_OPTS:--Xms2048m -Xmx4096m}
-      MAIL_HOST: ${MAIL_HOST:-mail.mjeunesse.gov.dz}
-      MAIL_PORT: ${MAIL_PORT:-465}
-      MAIL_USERNAME: ${MAIL_USERNAME:-no_reply_infs@mjeunesse.gov.dz}
-      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      JAVA_OPTS: ${JAVA_OPTS:--Xms512m -Xmx1024m}
+      MAIL_HOST: ${MAIL_HOST:-}
+      MAIL_PORT: ${MAIL_PORT:-25}
+      MAIL_USERNAME: ${MAIL_USERNAME:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
     ports:
       - "8080:8080"
     depends_on:
@@ -44,11 +47,11 @@ services:
     networks:
       - sig-network
     healthcheck:
-      test: [ "CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1" ]
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]
       interval: 30s
       timeout: 10s
-      retries: 5
-      start_period: 60s
+      retries: 10
+      start_period: 120s
 
   # Nuxt.js Frontend
   frontend:
@@ -70,10 +73,11 @@ services:
     networks:
       - sig-network
     healthcheck:
-      test: [ "CMD-SHELL", "curl -f http://localhost:8080 || exit 1" ]
+      test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://localhost:8080 || exit 1"]
       interval: 30s
       timeout: 10s
-      retries: 3
+      retries: 5
+      start_period: 30s
 
 networks:
   sig-network:

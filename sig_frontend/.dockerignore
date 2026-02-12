@@ -1,6 +1,49 @@
-node_modules
-.nuxt
-dist
-.git
+# Dependencies
+node_modules/
+
+# Build output
+.nuxt/
+dist/
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+
+# Git
+.git/
 .gitignore
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environment files
 .env
+.env.*
+!.env.example
+
+# Documentation
+*.md
+!README.md
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test files
+test/
+coverage/
+
+# Temporary files
+*.swp
+*.tmp
+*.swo
+
+# Docker files (not needed in build context)
+Dockerfile
+Dockerfile.dev
+docker-compose*.yml
+
+# Jenkins
+Jenkinsfile
