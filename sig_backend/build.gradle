@@ -66,20 +66,16 @@ dependencies {
 
     // GeoTools 30.2 - Complete modules
     implementation group: 'org.locationtech.jts', name: 'jts-core', version: '1.19.0'
-    
-    // Core GeoTools
+
+    // Core GeoTools (gt-main includes gt-data, gt-styling, gt-filter, gt-api functionality)
     implementation group: 'org.geotools', name: 'gt-main', version: "${geotoolsVersion}"
-    implementation group: 'org.geotools', name: 'gt-api', version: "${geotoolsVersion}"
-    implementation group: 'org.geotools', name: 'gt-data', version: "${geotoolsVersion}"
     implementation group: 'org.geotools', name: 'gt-shapefile', version: "${geotoolsVersion}"
-    
+
     // Styling and SLD
-    implementation group: 'org.geotools', name: 'gt-styling', version: "${geotoolsVersion}"
     implementation group: 'org.geotools', name: 'gt-brewer', version: "${geotoolsVersion}"
     implementation group: 'org.geotools.xsd', name: 'gt-xsd-sld', version: "${geotoolsVersion}"
-    
-    // Filter and Expression
-    implementation group: 'org.geotools', name: 'gt-filter', version: "${geotoolsVersion}"
+
+    // CQL (includes filter functionality)
     implementation group: 'org.geotools', name: 'gt-cql', version: "${geotoolsVersion}"
     
     // Process modules
