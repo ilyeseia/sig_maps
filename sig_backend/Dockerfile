@@ -17,21 +17,21 @@ RUN dos2unix gradlew && chmod +x gradlew
 COPY build.gradle .
 COPY settings.gradle ./
 
-# Download JAI libraries manually
+# Download JAI libraries manually (required by GeoTools)
 RUN mkdir -p /root/.m2/repository/javax/media/jai_core/1.1.3 && \
     wget -q -O /root/.m2/repository/javax/media/jai_core/1.1.3/jai_core-1.1.3.jar \
         "https://repo.osgeo.org/repository/release/javax/media/jai_core/1.1.3/jai_core-1.1.3.jar" || \
-    echo "JAI not downloaded, continuing..." && \
+    echo "JAI not downloaded, using exclusion strategy" && \
     echo '<?xml version="1.0"?><project><modelVersion>4.0.0</modelVersion><groupId>javax.media</groupId><artifactId>jai_core</artifactId><version>1.1.3</version></project>' > /root/.m2/repository/javax/media/jai_core/1.1.3/jai_core-1.1.3.pom
 
-# Download dependencies
+# Download dependencies (allow failure for caching)
 RUN ./gradlew dependencies --no-daemon || true
 
 # Copy source code
 COPY src src
 
 # Build the application
-RUN ./gradlew build -x test --no-daemon || ./gradlew bootJar -x test --no-daemon
+RUN ./gradlew build -x test --no-daemon
 
 # Runtime stage
 FROM eclipse-temurin:17-jre-alpine

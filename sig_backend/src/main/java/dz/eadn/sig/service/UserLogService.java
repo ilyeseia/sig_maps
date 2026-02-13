@@ -1,6 +1,6 @@
 package dz.eadn.sig.service;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import dz.eadn.sig.dto.UserLogDto;
 import dz.eadn.sig.model.UserLog;

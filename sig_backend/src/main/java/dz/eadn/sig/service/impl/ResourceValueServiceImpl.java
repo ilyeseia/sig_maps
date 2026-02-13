@@ -34,7 +34,7 @@ import dz.eadn.sig.repository.ResourceValueRepository;
 import dz.eadn.sig.service.ResourceValueService;
 import dz.eadn.sig.service.common.impl.CommonServiceImpl;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 
 /**
  * @author Achrouf Abdenour, LOKBANI Chouaib

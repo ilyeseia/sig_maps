@@ -7,7 +7,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 
 import dz.eadn.sig.dto.*;
 import dz.eadn.sig.exceptions.EntityNotFoundException;

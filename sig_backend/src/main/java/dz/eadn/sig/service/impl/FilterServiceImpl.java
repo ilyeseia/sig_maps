@@ -3,7 +3,7 @@ package dz.eadn.sig.service.impl;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 
 import dz.eadn.sig.service.*;
 import dz.eadn.sig.util.WITHUUID;

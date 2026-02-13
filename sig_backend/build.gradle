@@ -1,6 +1,6 @@
 plugins {
-    id 'org.springframework.boot' version '2.7.18'
-    id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+    id 'org.springframework.boot' version '3.2.0'
+    id 'io.spring.dependency-management' version '1.1.4'
     id 'java'
     id "org.sonarqube" version "4.4.1.3373"
 }
@@ -33,8 +33,8 @@ repositories {
 }
 
 ext {
-    set('springCloudVersion', "2021.0.8")
-    set('geotoolsVersion', "28.2")
+    set('springCloudVersion', "2023.0.0")
+    set('geotoolsVersion', "30.2")
 }
 
 dependencies {
@@ -58,19 +58,18 @@ dependencies {
 
     // Database
     runtimeOnly 'org.postgresql:postgresql'
-    implementation 'org.hibernate:hibernate-spatial'
+    implementation 'org.hibernate.orm:hibernate-spatial'
 
     // Flyway
-    implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.22.3'
+    implementation group: 'org.flywaydb', name: 'flyway-core', version: '10.8.1'
+    runtimeOnly 'org.flywaydb:flyway-database-postgresql:10.8.1'
 
-    // GeoTools 28.2 (Java 17 compatible)
+    // GeoTools 30.2 (Jakarta EE compatible)
     implementation group: 'org.locationtech.jts', name: 'jts-core', version: '1.19.0'
     implementation group: 'org.geotools', name: 'gt-main', version: "${geotoolsVersion}"
-    implementation group: 'org.geotools', name: 'gt-swing', version: "${geotoolsVersion}"
     implementation group: 'org.geotools', name: 'gt-shapefile', version: "${geotoolsVersion}"
     implementation group: 'org.geotools', name: 'gt-process', version: "${geotoolsVersion}"
     implementation group: 'org.geotools', name: 'gt-process-feature', version: "${geotoolsVersion}"
-    implementation group: 'org.geotools', name: 'gt-process-raster', version: "${geotoolsVersion}"
     implementation group: 'org.geotools', name: 'gt-process-geometry', version: "${geotoolsVersion}"
     implementation group: 'org.geotools', name: 'gt-geojson', version: "${geotoolsVersion}"
     implementation group: 'org.geotools', name: 'gt-xml', version: "${geotoolsVersion}"
@@ -79,7 +78,6 @@ dependencies {
     implementation group: 'org.geotools.xsd', name: 'gt-xsd-sld', version: "${geotoolsVersion}"
     implementation group: 'org.geotools.xsd', name: 'gt-xsd-kml', version: "${geotoolsVersion}"
     implementation group: 'org.geotools.xsd', name: 'gt-xsd-wfs', version: "${geotoolsVersion}"
-    implementation group: 'org.geotools', name: 'gt-wfs-ng', version: "${geotoolsVersion}"
     implementation group: 'org.geotools.jdbc', name: 'gt-jdbc-postgis', version: "${geotoolsVersion}"
 
     // Mapbox
@@ -95,22 +93,22 @@ dependencies {
     implementation group: 'com.github.ulisesbocchio', name: 'jasypt-spring-boot-starter', version: '3.0.5'
 
     // JWT
-    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
-    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
-    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
 
     // Redis
-    implementation group: 'redis.clients', name: 'jedis', version: '4.4.3'
+    implementation group: 'redis.clients', name: 'jedis', version: '5.1.0'
 
     // Lombok
     compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.30'
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.30'
 
-    // Hibernate Types
-    implementation 'io.hypersistence:hypersistence-utils-hibernate-55:3.5.0'
+    // Hibernate Types (for Hibernate 6.x / Spring Boot 3.x)
+    implementation 'io.hypersistence:hypersistence-utils-hibernate-63:3.7.3'
 
     // OpenAPI
-    implementation 'org.springdoc:springdoc-openapi-ui:1.7.0'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
 
     // Apache Commons
     implementation group: 'commons-io', name: 'commons-io', version: '2.15.1'
@@ -146,12 +144,8 @@ dependencies {
     // HSQLDB
     runtimeOnly 'org.hsqldb:hsqldb'
 
-    // JavaMail
-    implementation group: 'javax.mail', name: 'javax.mail-api', version: '1.6.2'
-    implementation group: 'com.sun.mail', name: 'javax.mail', version: '1.6.2'
-
-    // Servlet API (provided)
-    compileOnly group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
+    // Jakarta Mail (for Spring Boot 3.x)
+    implementation 'org.eclipse.angus:jakarta.mail:2.0.2'
 
     // Testing
     testImplementation('org.springframework.boot:spring-boot-starter-test')

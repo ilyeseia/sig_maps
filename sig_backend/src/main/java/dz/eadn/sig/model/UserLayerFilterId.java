@@ -2,7 +2,7 @@ package dz.eadn.sig.model;
 
 import lombok.*;
 
-import javax.persistence.Embeddable;
+import jakarta.persistence.Embeddable;
 import java.io.Serializable;
 import java.util.UUID;
 

@@ -1,6 +1,6 @@
 package dz.eadn.sig.repository.impl;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 
 import org.springframework.stereotype.Repository;
 

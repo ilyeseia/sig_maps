@@ -8,7 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 
 import dz.eadn.sig.exceptions.GlobalException;
 import org.locationtech.jts.geom.Geometry;

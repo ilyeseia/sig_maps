@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.mail.MessagingException;
+import jakarta.mail.MessagingException;
 
 import dz.eadn.sig.dto.CommonFilter;
 import dz.eadn.sig.dto.PageDto;

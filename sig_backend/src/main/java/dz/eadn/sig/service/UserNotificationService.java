@@ -5,9 +5,9 @@ package dz.eadn.sig.service;
 
 import java.util.UUID;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 
 import dz.eadn.sig.dto.CommonFilter;
 import dz.eadn.sig.dto.PageDto;

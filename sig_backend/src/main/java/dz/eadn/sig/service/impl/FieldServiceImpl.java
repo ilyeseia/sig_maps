@@ -15,8 +15,8 @@ import dz.eadn.sig.repository.FieldRepository;
 import dz.eadn.sig.service.FieldService;
 import dz.eadn.sig.service.common.impl.CommonServiceImpl;
 
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 
 /**
  * @author Achrouf Abdenour

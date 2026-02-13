@@ -7,7 +7,7 @@ import dz.eadn.sig.dto.LayerSimpleWithFieldsDto;
 import dz.eadn.sig.model.Layer;
 import org.locationtech.jts.geom.Geometry;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.Collection;
 import java.util.List;
 
