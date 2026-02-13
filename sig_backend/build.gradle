@@ -64,18 +64,18 @@ dependencies {
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '10.8.1'
     runtimeOnly 'org.flywaydb:flyway-database-postgresql:10.8.1'
 
-    // GeoTools 30.2 - Complete modules
+    // GeoTools 30.2 - Core modules
     implementation group: 'org.locationtech.jts', name: 'jts-core', version: '1.19.0'
-
-    // Core GeoTools (gt-main includes gt-data, gt-styling, gt-filter, gt-api functionality)
+    
+    // gt-main includes: gt-data, gt-styling, gt-filter functionality
     implementation group: 'org.geotools', name: 'gt-main', version: "${geotoolsVersion}"
+    
+    // gt-api provides org.opengis.* interfaces (required!)
+    implementation group: 'org.geotools', name: 'gt-api', version: "${geotoolsVersion}"
+    
     implementation group: 'org.geotools', name: 'gt-shapefile', version: "${geotoolsVersion}"
-
-    // Styling and SLD
     implementation group: 'org.geotools', name: 'gt-brewer', version: "${geotoolsVersion}"
     implementation group: 'org.geotools.xsd', name: 'gt-xsd-sld', version: "${geotoolsVersion}"
-
-    // CQL (includes filter functionality)
     implementation group: 'org.geotools', name: 'gt-cql', version: "${geotoolsVersion}"
     
     // Process modules
