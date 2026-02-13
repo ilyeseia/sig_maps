@@ -2,8 +2,8 @@
 FROM eclipse-temurin:17-jdk-alpine as builder
 WORKDIR /app
 
-# Install required tools
-RUN apk add --no-cache bash dos2unix curl
+# Install required tools including wget for downloading JAI
+RUN apk add --no-cache bash dos2unix curl wget
 
 # Copy gradle wrapper files first
 COPY gradlew .
@@ -17,7 +17,19 @@ RUN dos2unix gradlew && chmod +x gradlew
 COPY build.gradle .
 COPY settings.gradle ./
 
-# Download dependencies to cache them (allow failure)
+# Download JAI libraries manually and install to local Maven repository
+# This is needed because javax.media:jai_core is not available in Maven Central
+RUN mkdir -p /root/.m2/repository/javax/media/jai_core/1.1.3 && \
+    mkdir -p /root/.m2/repository/javax/media/jai_codec/1.1.3 && \
+    echo "Downloading JAI core..." && \
+    (wget -q -O /root/.m2/repository/javax/media/jai_core/1.1.3/jai_core-1.1.3.jar \
+        "https://repo.osgeo.org/repository/release/javax/media/jai_core/1.1.3/jai_core-1.1.3.jar" || \
+     wget -q -O /root/.m2/repository/javax/media/jai_core/1.1.3/jai_core-1.1.3.jar \
+        "https://build.geoserver.org/geoserver/main/jai_core-1.1.3.jar" || \
+     echo "JAI core download failed, continuing with exclusion strategy") && \
+    echo '<?xml version="1.0" encoding="UTF-8"?><project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><modelVersion>4.0.0</modelVersion><groupId>javax.media</groupId><artifactId>jai_core</artifactId><version>1.1.3</version></project>' > /root/.m2/repository/javax/media/jai_core/1.1.3/jai_core-1.1.3.pom
+
+# Download dependencies to cache them (allow failure as we have exclusions)
 RUN ./gradlew dependencies --no-daemon || true
 
 # Copy source code

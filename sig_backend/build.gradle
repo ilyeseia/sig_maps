@@ -17,12 +17,19 @@ configurations {
     compileOnly {
         extendsFrom annotationProcessor
     }
+    all {
+        // Exclude JAI dependencies that are not available in Maven Central
+        exclude group: 'javax.media', module: 'jai_core'
+        exclude group: 'javax.media', module: 'jai_codec'
+        exclude group: 'javax.media', module: 'jai_imageio'
+    }
 }
 
 repositories {
     mavenLocal()
     mavenCentral()
     maven { url "https://repo.osgeo.org/repository/release/" }
+    maven { url "https://repo.osgeo.org/repository/geotools-releases/" }
     google()
 }
 
@@ -42,99 +49,101 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    
+
     // Session
     implementation 'org.springframework.session:spring-session-core'
-    
+
     // Model Mapper
     implementation group: 'org.modelmapper', name: 'modelmapper', version: '3.2.0'
-    
+
     // Database
     runtimeOnly 'org.postgresql:postgresql'
     implementation 'org.hibernate.orm:hibernate-spatial'
-    
+
     // Flyway
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '10.8.1'
     runtimeOnly 'org.flywaydb:flyway-database-postgresql:10.8.1'
-    
+
     // GeoTools 30.2 (Jakarta EE compatible)
+    // Note: gt-swing and gt-process-raster are excluded as they require JAI which is not available
     implementation group: 'org.locationtech.jts', name: 'jts-core', version: '1.19.0'
     implementation group: 'org.geotools.xsd', name: 'gt-xsd-sld', version: "${geotoolsVersion}"
-    implementation group: 'org.geotools', name: 'gt-swing', version: "${geotoolsVersion}"
     implementation group: 'org.geotools', name: 'gt-shapefile', version: "${geotoolsVersion}"
     implementation group: 'org.geotools', name: 'gt-process', version: "${geotoolsVersion}"
     implementation group: 'org.geotools', name: 'gt-process-feature', version: "${geotoolsVersion}"
-    implementation group: 'org.geotools', name: 'gt-process-raster', version: "${geotoolsVersion}"
     implementation group: 'org.geotools', name: 'gt-process-geometry', version: "${geotoolsVersion}"
     implementation group: 'org.geotools', name: 'gt-geojson', version: "${geotoolsVersion}"
     implementation group: 'org.geotools', name: 'gt-xml', version: "${geotoolsVersion}"
     implementation group: 'org.geotools.xsd', name: 'gt-xsd-kml', version: "${geotoolsVersion}"
     implementation group: 'org.geotools.xsd', name: 'gt-xsd-wfs', version: "${geotoolsVersion}"
-    
+    implementation group: 'org.geotools', name: 'gt-main', version: "${geotoolsVersion}"
+    implementation group: 'org.geotools', name: 'gt-referencing', version: "${geotoolsVersion}"
+    implementation group: 'org.geotools', name: 'gt-epsg-hsql', version: "${geotoolsVersion}"
+
     // Mapbox
     implementation group: 'com.mapbox.mapboxsdk', name: 'mapbox-java-geojson', version: '2.2.10'
-    
+
     // Spring Cloud
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
-    
+
     // Dev Tools
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    
+
     // Security - Jasypt
     implementation group: 'com.github.ulisesbocchio', name: 'jasypt-spring-boot-starter', version: '3.0.5'
-    
+
     // JWT - modular version for Java 17+
     implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
-    
+
     // Redis
     implementation group: 'redis.clients', name: 'jedis', version: '5.1.0'
-    
+
     // Lombok
     compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.30'
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.30'
-    
+
     // Hibernate Types
     implementation 'io.hypersistence:hypersistence-utils-hibernate-63:3.7.3'
-    
+
     // OpenAPI
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
-    
+
     // Apache Commons
     implementation group: 'commons-io', name: 'commons-io', version: '2.15.1'
-    
+
     // Velocity Engine
     implementation group: 'org.apache.velocity', name: 'velocity-engine-core', version: '2.3'
-    
+
     // CSV
     implementation group: 'com.opencsv', name: 'opencsv', version: '5.9'
-    
+
     // User Agent
     implementation group: 'eu.bitwalker', name: 'UserAgentUtils', version: '1.21'
-    
+
     // Google HTTP Client
     implementation group: 'com.google.http-client', name: 'google-http-client', version: '1.44.1'
-    
+
     // Jackson CSV
     implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-csv', version: '2.16.1'
-    
+
     // PDF
     implementation group: 'com.itextpdf', name: 'itextpdf', version: '5.5.13.3'
-    
+
     // Apache POI
     implementation group: 'org.apache.poi', name: 'poi', version: '5.2.5'
     implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '5.2.5'
-    
+
     // DOM4J
     implementation group: 'org.dom4j', name: 'dom4j', version: '2.1.4'
-    
-    // ImageIO
-    implementation group: 'it.geosolutions.imageio-ext', name: 'imageio-ext-png', version: '1.4.10'
-    
-    // HSQLDB (for testing)
+
+    // JAI ImageIO replacement (modern alternative to javax.media JAI)
+    implementation group: 'com.github.jai-imageio', name: 'jai-imageio-core', version: '1.4.0'
+
+    // HSQLDB (for testing and EPSG database)
     runtimeOnly 'org.hsqldb:hsqldb'
-    
+
     // Testing
     testImplementation('org.springframework.boot:spring-boot-starter-test')
     testImplementation 'org.springframework.security:spring-security-test'

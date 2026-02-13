@@ -5,27 +5,26 @@ WORKDIR /usr/src/app
 # Install build dependencies
 RUN apk add --no-cache python3 make g++ git
 
-# Set Node options for OpenSSL legacy provider (required for Nuxt 2)
+# Set Node options for OpenSSL legacy provider (required for Nuxt 2 with Node 18)
 ENV NODE_OPTIONS=--openssl-legacy-provider
 ENV NODE_ENV=production
 
 # Configure npm for better reliability
 RUN npm config set fetch-timeout 600000 && \
-    npm config set fetch-retry-maxtimeout 120000 && \
-    npm config set registry https://registry.npmmirror.com
+    npm config set fetch-retry-maxtimeout 120000
 
 # Copy package files first for better caching
 COPY package.json ./
 
 # Install dependencies with timeout and retry settings
-RUN npm install --legacy-peer-deps --verbose || \
-    (rm -rf node_modules && npm install --legacy-peer-deps)
+RUN npm install --legacy-peer-deps || \
+    (rm -rf node_modules package-lock.json && npm install --legacy-peer-deps)
 
 # Copy application code
 COPY . .
 
-# Build for production
-RUN npm run generate
+# Build for production (generate static files)
+RUN npm run generate || npm run build
 
 # Production stage with nginx
 FROM nginx:alpine
@@ -34,7 +33,8 @@ WORKDIR /usr/share/nginx/html
 # Remove default nginx static assets
 RUN rm -rf ./*
 
-# Copy built application from builder (Nuxt SPA generates to dist/ folder)
+# Copy built application from builder
+# Nuxt generate creates files in dist/ folder
 COPY --from=builder --chown=nginx:nginx /usr/src/app/dist /usr/share/nginx/html
 
 # Create nginx configuration for 8080 port (non-root)
