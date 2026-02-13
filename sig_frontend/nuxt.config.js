@@ -59,15 +59,6 @@ module.exports = {
     'ant-design-vue/dist/antd.min.css',
     '@fortawesome/fontawesome-free/css/all.min.css',
     'bootstrap/dist/css/bootstrap.min.css',
-    '@syncfusion/ej2-base/styles/material.css',
-    '@syncfusion/ej2-buttons/styles/material.css',
-    '@syncfusion/ej2-popups/styles/material.css',
-    '@syncfusion/ej2-splitbuttons/styles/material.css',
-    '@syncfusion/ej2-inputs/styles/material.css',
-    '@syncfusion/ej2-calendars/styles/material.css',
-    '@syncfusion/ej2-dropdowns/styles/material.css',
-    '@syncfusion/ej2-navigations/styles/material.css',
-    '@syncfusion/ej2-grids/styles/material.css',
     '@/assets/sass/main.scss'
   ],
 

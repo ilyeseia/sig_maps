@@ -3,7 +3,7 @@ FROM eclipse-temurin:17-jdk-alpine as builder
 WORKDIR /app
 
 # Install required tools
-RUN apk add --no-cache bash dos2unix
+RUN apk add --no-cache bash dos2unix curl
 
 # Copy gradle wrapper files first
 COPY gradlew .
@@ -17,14 +17,15 @@ RUN dos2unix gradlew && chmod +x gradlew
 COPY build.gradle .
 COPY settings.gradle ./
 
-# Download dependencies to cache them
-RUN ./gradlew dependencies --no-daemon --info || true
+# Download dependencies to cache them (allow failure)
+RUN ./gradlew dependencies --no-daemon || true
 
 # Copy source code
 COPY src src
 
 # Build the application (skip tests for faster builds)
-RUN ./gradlew build -x test --no-daemon --info
+RUN ./gradlew build -x test --no-daemon || \
+    ./gradlew bootJar -x test --no-daemon
 
 # Runtime stage
 FROM eclipse-temurin:17-jre-alpine

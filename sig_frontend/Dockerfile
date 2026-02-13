@@ -2,15 +2,18 @@
 FROM node:18-alpine as builder
 WORKDIR /usr/src/app
 
+# Install build dependencies
+RUN apk add --no-cache python3 make g++
+
 # Set Node options for OpenSSL legacy provider (required for Nuxt 2)
 ENV NODE_OPTIONS=--openssl-legacy-provider
 ENV NODE_ENV=production
 
-# Copy package files
-COPY package.json ./
+# Copy package files first for better caching
+COPY package.json package-lock.json* ./
 
-# Install dependencies
-RUN npm install --legacy-peer-deps
+# Install dependencies with legacy peer deps
+RUN npm ci --legacy-peer-deps || npm install --legacy-peer-deps
 
 # Copy application code
 COPY . .
