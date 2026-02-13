@@ -7,7 +7,7 @@ RUN apk add --no-cache python3 make g++ git
 
 # Set Node options for OpenSSL legacy provider (required for Nuxt 2 with Node 18)
 ENV NODE_OPTIONS=--openssl-legacy-provider
-ENV NODE_ENV=production
+# Don't set NODE_ENV=production during build - we need devDependencies for sass
 
 # Configure npm for better reliability
 RUN npm config set fetch-timeout 600000 && \
@@ -16,7 +16,7 @@ RUN npm config set fetch-timeout 600000 && \
 # Copy package files first for better caching
 COPY package.json ./
 
-# Install dependencies with timeout and retry settings
+# Install ALL dependencies (including devDependencies for sass)
 RUN npm install --legacy-peer-deps || \
     (rm -rf node_modules package-lock.json && npm install --legacy-peer-deps)
 
@@ -34,7 +34,6 @@ WORKDIR /usr/share/nginx/html
 RUN rm -rf ./*
 
 # Copy built application from builder
-# Nuxt generate creates files in dist/ folder
 COPY --from=builder --chown=nginx:nginx /usr/src/app/dist /usr/share/nginx/html
 
 # Create nginx configuration for 8080 port (non-root)
