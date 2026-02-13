@@ -48,6 +48,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
 
     // Session
     implementation 'org.springframework.session:spring-session-core'
@@ -64,7 +65,7 @@ dependencies {
 
     // GeoTools 28.2 (Java 17 compatible)
     implementation group: 'org.locationtech.jts', name: 'jts-core', version: '1.19.0'
-    implementation group: 'org.geotools.xsd', name: 'gt-xsd-sld', version: "${geotoolsVersion}"
+    implementation group: 'org.geotools', name: 'gt-main', version: "${geotoolsVersion}"
     implementation group: 'org.geotools', name: 'gt-swing', version: "${geotoolsVersion}"
     implementation group: 'org.geotools', name: 'gt-shapefile', version: "${geotoolsVersion}"
     implementation group: 'org.geotools', name: 'gt-process', version: "${geotoolsVersion}"
@@ -73,14 +74,13 @@ dependencies {
     implementation group: 'org.geotools', name: 'gt-process-geometry', version: "${geotoolsVersion}"
     implementation group: 'org.geotools', name: 'gt-geojson', version: "${geotoolsVersion}"
     implementation group: 'org.geotools', name: 'gt-xml', version: "${geotoolsVersion}"
-    implementation group: 'org.geotools.xsd', name: 'gt-xsd-kml', version: "${geotoolsVersion}"
-    implementation group: 'org.geotools.xsd', name: 'gt-xsd-wfs', version: "${geotoolsVersion}"
-    implementation group: 'org.geotools', name: 'gt-main', version: "${geotoolsVersion}"
     implementation group: 'org.geotools', name: 'gt-referencing', version: "${geotoolsVersion}"
     implementation group: 'org.geotools', name: 'gt-epsg-hsql', version: "${geotoolsVersion}"
-    implementation group: 'org.geotools', name: 'gt-styling', version: "${geotoolsVersion}"
-    implementation group: 'org.geotools', name: 'gt-filter', version: "${geotoolsVersion}"
-    implementation group: 'org.geotools', name: 'gt-data', version: "${geotoolsVersion}"
+    implementation group: 'org.geotools.xsd', name: 'gt-xsd-sld', version: "${geotoolsVersion}"
+    implementation group: 'org.geotools.xsd', name: 'gt-xsd-kml', version: "${geotoolsVersion}"
+    implementation group: 'org.geotools.xsd', name: 'gt-xsd-wfs', version: "${geotoolsVersion}"
+    implementation group: 'org.geotools', name: 'gt-wfs-ng', version: "${geotoolsVersion}"
+    implementation group: 'org.geotools.jdbc', name: 'gt-jdbc-postgis', version: "${geotoolsVersion}"
 
     // Mapbox
     implementation group: 'com.mapbox.mapboxsdk', name: 'mapbox-java-geojson', version: '2.2.10'
@@ -145,6 +145,13 @@ dependencies {
 
     // HSQLDB
     runtimeOnly 'org.hsqldb:hsqldb'
+
+    // JavaMail
+    implementation group: 'javax.mail', name: 'javax.mail-api', version: '1.6.2'
+    implementation group: 'com.sun.mail', name: 'javax.mail', version: '1.6.2'
+
+    // Servlet API (provided)
+    compileOnly group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
 
     // Testing
     testImplementation('org.springframework.boot:spring-boot-starter-test')
