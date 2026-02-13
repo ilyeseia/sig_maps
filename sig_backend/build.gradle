@@ -64,21 +64,53 @@ dependencies {
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '10.8.1'
     runtimeOnly 'org.flywaydb:flyway-database-postgresql:10.8.1'
 
-    // GeoTools 30.2 (Jakarta EE compatible)
+    // GeoTools 30.2 - Complete modules
     implementation group: 'org.locationtech.jts', name: 'jts-core', version: '1.19.0'
+    
+    // Core GeoTools
     implementation group: 'org.geotools', name: 'gt-main', version: "${geotoolsVersion}"
+    implementation group: 'org.geotools', name: 'gt-api', version: "${geotoolsVersion}"
+    implementation group: 'org.geotools', name: 'gt-data', version: "${geotoolsVersion}"
     implementation group: 'org.geotools', name: 'gt-shapefile', version: "${geotoolsVersion}"
+    
+    // Styling and SLD
+    implementation group: 'org.geotools', name: 'gt-styling', version: "${geotoolsVersion}"
+    implementation group: 'org.geotools', name: 'gt-brewer', version: "${geotoolsVersion}"
+    implementation group: 'org.geotools.xsd', name: 'gt-xsd-sld', version: "${geotoolsVersion}"
+    
+    // Filter and Expression
+    implementation group: 'org.geotools', name: 'gt-filter', version: "${geotoolsVersion}"
+    implementation group: 'org.geotools', name: 'gt-cql', version: "${geotoolsVersion}"
+    
+    // Process modules
     implementation group: 'org.geotools', name: 'gt-process', version: "${geotoolsVersion}"
     implementation group: 'org.geotools', name: 'gt-process-feature', version: "${geotoolsVersion}"
     implementation group: 'org.geotools', name: 'gt-process-geometry', version: "${geotoolsVersion}"
+    implementation group: 'org.geotools', name: 'gt-process-raster', version: "${geotoolsVersion}"
+    
+    // Data formats
     implementation group: 'org.geotools', name: 'gt-geojson', version: "${geotoolsVersion}"
     implementation group: 'org.geotools', name: 'gt-xml', version: "${geotoolsVersion}"
-    implementation group: 'org.geotools', name: 'gt-referencing', version: "${geotoolsVersion}"
-    implementation group: 'org.geotools', name: 'gt-epsg-hsql', version: "${geotoolsVersion}"
-    implementation group: 'org.geotools.xsd', name: 'gt-xsd-sld', version: "${geotoolsVersion}"
     implementation group: 'org.geotools.xsd', name: 'gt-xsd-kml', version: "${geotoolsVersion}"
     implementation group: 'org.geotools.xsd', name: 'gt-xsd-wfs', version: "${geotoolsVersion}"
+    implementation group: 'org.geotools.xsd', name: 'gt-xsd-gml2', version: "${geotoolsVersion}"
+    implementation group: 'org.geotools.xsd', name: 'gt-xsd-gml3', version: "${geotoolsVersion}"
+    
+    // Referencing and CRS
+    implementation group: 'org.geotools', name: 'gt-referencing', version: "${geotoolsVersion}"
+    implementation group: 'org.geotools', name: 'gt-epsg-hsql', version: "${geotoolsVersion}"
+    implementation group: 'org.geotools', name: 'gt-epsg-extension', version: "${geotoolsVersion}"
+    
+    // JDBC and WFS
     implementation group: 'org.geotools.jdbc', name: 'gt-jdbc-postgis', version: "${geotoolsVersion}"
+    implementation group: 'org.geotools', name: 'gt-wfs-ng', version: "${geotoolsVersion}"
+    
+    // Swing (for UI components if needed)
+    implementation group: 'org.geotools', name: 'gt-swing', version: "${geotoolsVersion}"
+    
+    // Coverage and Raster
+    implementation group: 'org.geotools', name: 'gt-coverage', version: "${geotoolsVersion}"
+    implementation group: 'org.geotools', name: 'gt-geotiff', version: "${geotoolsVersion}"
 
     // Mapbox
     implementation group: 'com.mapbox.mapboxsdk', name: 'mapbox-java-geojson', version: '2.2.10'
@@ -146,6 +178,12 @@ dependencies {
 
     // Jakarta Mail (for Spring Boot 3.x)
     implementation 'org.eclipse.angus:jakarta.mail:2.0.2'
+
+    // JSON Smart (for @JsonIgnore)
+    implementation group: 'net.minidev', name: 'json-smart', version: '2.5.0'
+
+    // Janino (for dynamic Java expressions)
+    implementation group: 'org.codehaus.janino', name: 'janino', version: '3.1.11'
 
     // Testing
     testImplementation('org.springframework.boot:spring-boot-starter-test')

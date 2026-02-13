@@ -11,7 +11,7 @@ import jakarta.persistence.Table;
 
 import dz.eadn.sig.util.WITHUUID;
 import lombok.*;
-import net.minidev.json.annotate.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * @author Achrouf Abdenour
