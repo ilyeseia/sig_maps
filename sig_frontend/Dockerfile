@@ -3,17 +3,23 @@ FROM node:18-alpine as builder
 WORKDIR /usr/src/app
 
 # Install build dependencies
-RUN apk add --no-cache python3 make g++
+RUN apk add --no-cache python3 make g++ git
 
 # Set Node options for OpenSSL legacy provider (required for Nuxt 2)
 ENV NODE_OPTIONS=--openssl-legacy-provider
 ENV NODE_ENV=production
 
-# Copy package files first for better caching
-COPY package.json package-lock.json* ./
+# Configure npm for better reliability
+RUN npm config set fetch-timeout 600000 && \
+    npm config set fetch-retry-maxtimeout 120000 && \
+    npm config set registry https://registry.npmmirror.com
 
-# Install dependencies with legacy peer deps
-RUN npm ci --legacy-peer-deps || npm install --legacy-peer-deps
+# Copy package files first for better caching
+COPY package.json ./
+
+# Install dependencies with timeout and retry settings
+RUN npm install --legacy-peer-deps --verbose || \
+    (rm -rf node_modules && npm install --legacy-peer-deps)
 
 # Copy application code
 COPY . .
